@@ -31,7 +31,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Calendar29 } from "./Calendar";
-import { SlideBar } from "@/app/layout/SideBar";
 
 // Fake data
 const data = [
@@ -40,30 +39,35 @@ const data = [
     amount: 316,
     status: "success",
     email: "ken99@example.com",
+    food: "2 foods",
   },
   {
     id: "3u1reuv4",
     amount: 242,
     status: "success",
     email: "Abe45@example.com",
+    food: "2 foods",
   },
   {
     id: "derv1ws0",
     amount: 837,
     status: "processing",
     email: "Monserrat44@example.com",
+    food: "2 foods",
   },
   {
     id: "5kma53ae",
     amount: 874,
     status: "success",
     email: "Silas22@example.com",
+    food: "2 foods",
   },
   {
     id: "bhqecj4p",
     amount: 721,
     status: "failed",
     email: "carmella@example.com",
+    food: "2 foods",
   },
 ];
 
@@ -181,7 +185,6 @@ export function Order() {
 
   return (
     <div className="flex w-screen h-screen gap-6 items-center justify-center">
-      <SlideBar />
       <div className="w-[1170px]">
         <div className="flex items-center py-4 border-t border-r border-l rounded-t-md justify-between p-4">
           <div className="flex flex-col">

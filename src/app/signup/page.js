@@ -26,11 +26,20 @@ export default function SignupPage({ className }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitted data:", formData);
+    if (!formData.password || !formData.confirmPassword) {
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+
+    router.push("/login");
   };
   const handleClickLoginButton = () => {
     router.push("/login");
   };
+
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">

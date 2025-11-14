@@ -1,7 +1,10 @@
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-export function LoginForm() {
+export function LoginForm({ setForgetPass, forget }) {
+  const handleClickForgotPassword = () => {
+    setForgetPass(true);
+  };
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col items-start text-center">
@@ -21,7 +24,11 @@ export function LoginForm() {
       <Field>
         <Input id="password" type="password" placeholder="Password" required />
         <div className="flex items-center">
-          <a href="#" className=" text-sm underline-offset-2 hover:underline">
+          <a
+            href="#"
+            className=" text-sm underline-offset-2 hover:underline"
+            onClick={handleClickForgotPassword}
+          >
             Forgot your password?
           </a>
         </div>

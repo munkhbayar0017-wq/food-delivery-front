@@ -8,11 +8,19 @@ import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import Image from "next/image";
 import { LoginForm2 } from "@/components/login-form2";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { LoginForm3 } from "@/components/login-form3";
+import { LoginForm4 } from "@/components/login-form4";
 
 export default function LoginPage({ className }) {
+  const [forgetPass, setForgetPass] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState(false);
   const router = useRouter();
   const handleClickSignupButton = () => {
     router.push("/signup");
+  };
+  const handleClickSendLinkButton = () => {
+    setVerifyEmail(true);
   };
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -23,10 +31,14 @@ export default function LoginPage({ className }) {
               <div className="flex items-center justify-center">
                 <form className="p-6 md:p-8 flex flex-col items-start gap-6 justify-center w-[416px]">
                   <FieldGroup>
-                    <LoginForm />
-                    {/* <LoginForm2 /> */}
+                    {!forgetPass && <LoginForm setForgetPass={setForgetPass} />}
+                    {forgetPass && <LoginForm2 />}
+                    {verifyEmail || (!forgetPass && <LoginForm3 />)}
+                    {/* {<LoginForm4 />} */}
                     <Field>
-                      <Button type="submit">Let&apos;s Go</Button>
+                      <Button type="submit" onClick={handleClickSendLinkButton}>
+                        {!forgetPass ? "Let's Go" : "Send link"}
+                      </Button>
                     </Field>
                     <FieldDescription className="text-center">
                       Don&apos;t have an account?{" "}
