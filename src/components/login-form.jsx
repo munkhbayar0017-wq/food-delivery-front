@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 
 export function LoginForm({ setForgetPass, forget }) {
   const handleClickForgotPassword = () => {
-    setForgetPass(true);
+    setForgetPass(2);
   };
   return (
     <div className="flex flex-col gap-4">

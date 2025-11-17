@@ -13,14 +13,14 @@ import { LoginForm3 } from "@/components/login-form3";
 import { LoginForm4 } from "@/components/login-form4";
 
 export default function LoginPage({ className }) {
-  const [forgetPass, setForgetPass] = useState(false);
-  const [verifyEmail, setVerifyEmail] = useState(false);
+  const [forgetPass, setForgetPass] = useState(1);
+  // const [verifyEmail, setVerifyEmail] = useState(false);
   const router = useRouter();
   const handleClickSignupButton = () => {
     router.push("/signup");
   };
   const handleClickSendLinkButton = () => {
-    setVerifyEmail(true);
+    setForgetPass(3);
   };
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -31,9 +31,11 @@ export default function LoginPage({ className }) {
               <div className="flex items-center justify-center">
                 <form className="p-6 md:p-8 flex flex-col items-start gap-6 justify-center w-[416px]">
                   <FieldGroup>
-                    {!forgetPass && <LoginForm setForgetPass={setForgetPass} />}
-                    {forgetPass && <LoginForm2 />}
-                    {verifyEmail || (!forgetPass && <LoginForm3 />)}
+                    {forgetPass === 1 && (
+                      <LoginForm setForgetPass={setForgetPass} />
+                    )}
+                    {forgetPass === 2 && <LoginForm2 />}
+                    {forgetPass === 3 && <LoginForm3 />}
                     {/* {<LoginForm4 />} */}
                     <Field>
                       <Button type="submit" onClick={handleClickSendLinkButton}>

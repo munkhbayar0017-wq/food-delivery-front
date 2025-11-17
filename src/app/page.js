@@ -8,12 +8,12 @@ import { Footer } from "./layout/Footer";
 export default function Home() {
   return (
     <div>
-      <Footer />
+      {/* <Footer /> */}
       {/* <Administrator /> */}
       {/* <Order /> */}
       {/* <SignupPage /> */}
-      {/* <LoginPage />
-      <LoginForm /> */}
+      <LoginPage />
+      {/* <LoginForm /> */}
     </div>
   );
 }
