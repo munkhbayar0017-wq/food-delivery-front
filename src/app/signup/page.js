@@ -10,9 +10,11 @@ import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import ChevronLeftIcon from "../Icons/ChevronLeftIcon";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function SignupPage({ className }) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [error, setError] = useState("");
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -24,6 +26,20 @@ export default function SignupPage({ className }) {
   const nextStep = () => setCurrentStep((s) => Math.min(s + 1, totalSteps));
   const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
 
+  const postUser = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:168/authentication/sign-up",
+        { email: formData.email, password: formData.password }
+      );
+      const handleClickLetsgoButton = () => {
+        router.push("/login");
+      };
+    } catch (err) {
+      setError(err.response.data);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.password || !formData.confirmPassword) {
@@ -31,10 +47,10 @@ export default function SignupPage({ className }) {
     }
 
     if (formData.password !== formData.confirmPassword) {
+      setError("Password doesn't match");
       return;
     }
-
-    router.push("/login");
+    postUser();
   };
   const handleClickLoginButton = () => {
     router.push("/login");
@@ -44,7 +60,7 @@ export default function SignupPage({ className }) {
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">
         <div className={cn("flex flex-col gap-6 items-center", className)}>
-          <Card className="overflow-hidden p-0 w-[1440px] h-[1024px]">
+          <Card className="overflow-hidden p-0 w-full max-w-5xl h-auto">
             <CardContent className="grid p-0 md:grid-cols-2 h-full w-full">
               <div className="flex items-center justify-center">
                 <form
@@ -87,11 +103,11 @@ export default function SignupPage({ className }) {
                       />
                     )}
                     <Field>
-                      <Button type="submit">
-                        {currentStep === totalSteps ? "Let's Go" : "Let's Go"}
+                      <Button type="submit" onClick={handleClickLetsgoButton}>
+                        Let&apos;s go
                       </Button>
                     </Field>
-
+                    <div className="text-red-600">{error}</div>
                     <FieldDescription className="text-center flex justify-center gap-1">
                       Already have an account?
                       <a

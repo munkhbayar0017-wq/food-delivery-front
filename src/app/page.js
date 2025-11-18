@@ -1,8 +1,8 @@
 import { LoginForm } from "@/components/login-form";
-import { Order } from "./Administrator/orders/Order";
+import { Order } from "./administrator/orders/Order";
 import LoginPage from "./login/page";
 import SignupPage from "./signup/page";
-import { Administrator } from "./Administrator/Administrator";
+import { Administrator } from "./administrator/Administrator";
 import { Footer } from "./layout/Footer";
 
 export default function Home() {

@@ -4,7 +4,7 @@ import TruckIcon from "../Icons/TruckIcon";
 import LogoIcon from "../Icons/LogoIcon";
 import MenuIcon from "../Icons/MenuIcon";
 import { useState } from "react";
-import { Order } from "./orders/Order";
+import { Order } from "../../app/administrator/orders/Order";
 import { cn } from "@/lib/utils";
 
 export function Administrator() {
