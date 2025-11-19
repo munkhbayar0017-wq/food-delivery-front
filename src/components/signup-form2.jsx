@@ -1,9 +1,10 @@
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Checkbox } from "./ui/checkbox";
 
-export function SignupForm2({ className, formData, setFormData, ...props }) {
+export function SignupForm2({ formik }) {
+  const { values, handleChange, handleBlur, errors, touched } = formik;
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="flex flex-col gap-6">
@@ -16,29 +17,37 @@ export function SignupForm2({ className, formData, setFormData, ...props }) {
       <Field>
         <Field className="flex flex-col gap-4">
           <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
             <Input
-              id="password"
+              name="password"
               type={showPassword ? "text" : "password"}
               required
-              value={formData.password || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
+              placeholder="Password"
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
             />
           </Field>
+          {errors.password && touched.password && (
+            <div className="text-red-500 font-inter text-sm font-normal leading-5">
+              {errors.password}
+            </div>
+          )}
           <Field>
-            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
             <Input
-              id="confirm-password"
+              name="confirmPassword"
               type={showPassword ? "text" : "password"}
               required
-              value={formData.confirmPassword || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
+              placeholder="Confirm"
+              value={values.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
             />
           </Field>
+          {errors.confirmPassword && touched.confirmPassword && (
+            <div className="text-red-500 font-inter text-sm font-normal leading-5">
+              {errors.confirmPassword}
+            </div>
+          )}
         </Field>
         <div className="flex gap-2">
           <Checkbox

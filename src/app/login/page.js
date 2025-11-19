@@ -6,21 +6,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import Image from "next/image";
-import { LoginForm2 } from "@/components/login-form2";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import ChevronLeftIcon from "../Icons/ChevronLeftIcon";
 import { useState } from "react";
-import { LoginForm3 } from "@/components/login-form3";
-import { LoginForm4 } from "@/components/login-form4";
 
 export default function LoginPage({ className }) {
-  const [forgetPass, setForgetPass] = useState(1);
-  // const [verifyEmail, setVerifyEmail] = useState(false);
   const router = useRouter();
+  const [serverError, setServerError] = useState("");
+
+  const loginSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string().required("Required"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+    onSubmit: async (values) => {
+      try {
+        setServerError("");
+        await axios.post("http://localhost:168/authentication/login", {
+          email: values.email,
+          password: values.password,
+        });
+        console.log("Push to homepage success");
+        router.push("/");
+      } catch (error) {
+        setServerError(error.response?.data?.message || "Incorrect password");
+      }
+    },
+  });
+  const { values, errors } = formik;
   const handleClickSignupButton = () => {
     router.push("/signup");
   };
-  const handleClickSendLinkButton = () => {
-    setForgetPass(3);
+  const handleClickChevronButton = () => {
+    router.push("/");
   };
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -29,25 +56,38 @@ export default function LoginPage({ className }) {
           <Card className="overflow-hidden p-0 w-[1440px] h-[1024px]">
             <CardContent className="grid p-0 md:grid-cols-2 h-full w-full">
               <div className="flex items-center justify-center">
-                <form className="p-6 md:p-8 flex flex-col items-start gap-6 justify-center w-[416px]">
+                <form
+                  onSubmit={formik.handleSubmit}
+                  className="p-6 md:p-8 flex flex-col items-start gap-6 justify-center w-[416px]"
+                >
+                  <div
+                    className="w-9 h-9 rounded-md border flex items-center justify-center cursor-pointer  hover:bg-gray-200 hover:text-black transition-colors duration-200"
+                    onClick={handleClickChevronButton}
+                  >
+                    <ChevronLeftIcon />
+                  </div>
                   <FieldGroup>
-                    {forgetPass === 1 && (
-                      <LoginForm setForgetPass={setForgetPass} />
-                    )}
-                    {forgetPass === 2 && <LoginForm2 />}
-                    {forgetPass === 3 && <LoginForm3 />}
-                    {/* {<LoginForm4 />} */}
+                    <LoginForm formik={formik} serverError={serverError} />
                     <Field>
-                      <Button type="submit" onClick={handleClickSendLinkButton}>
-                        {!forgetPass ? "Let's Go" : "Send link"}
+                      <Button
+                        type="submit"
+                        disabled={
+                          errors.email ||
+                          !values.email ||
+                          errors.password ||
+                          !values.password
+                        }
+                        className="cursor-pointer"
+                      >
+                        Let&apos;s go
                       </Button>
                     </Field>
                     <FieldDescription className="text-center">
-                      Don&apos;t have an account?{" "}
+                      Don&apos;t have an account?
                       <a
                         onClick={handleClickSignupButton}
                         href="#"
-                        className="text-[#2563EB]"
+                        className="text-[#2563EB] pl-1"
                       >
                         Sign up
                       </a>

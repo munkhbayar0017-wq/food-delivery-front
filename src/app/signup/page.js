@@ -11,56 +11,75 @@ import { cn } from "@/lib/utils";
 import ChevronLeftIcon from "../Icons/ChevronLeftIcon";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 export default function SignupPage({ className }) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [error, setError] = useState("");
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const [serverError, setServerError] = useState("");
+
+  const signupSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Required"),
+
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Must be at least 8 characters")
+      .matches(/[A-Z]/, "Must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Must contain at least one number")
+      .matches(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Must contain at least one special character"
+      ),
+
+    confirmPassword: Yup.string()
+      .required("Confirm password is required")
+      .oneOf([Yup.ref("password"), null], "Passwords not match"),
   });
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: signupSchema,
+    onSubmit: async (values) => {
+      try {
+        setServerError("");
+        await axios.post("http://localhost:168/authentication/sign-up", {
+          email: values.email,
+          password: values.password,
+        });
+
+        router.push("/login");
+      } catch (error) {
+        // console.log(error.response?.data);
+        setServerError(error.response?.data?.message || "User already exists");
+      }
+    },
+  });
+  const { values, errors } = formik;
   const totalSteps = 2;
 
   const nextStep = () => setCurrentStep((s) => Math.min(s + 1, totalSteps));
   const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
-
-  const postUser = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:168/authentication/sign-up",
-        { email: formData.email, password: formData.password }
-      );
-      const handleClickLetsgoButton = () => {
-        router.push("/login");
-      };
-    } catch (err) {
-      setError(err.response.data);
+  const handleClickChevronButton = () => {
+    if (currentStep === 1) {
+      router.push("/");
+    } else {
+      prevStep();
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.password || !formData.confirmPassword) {
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Password doesn't match");
-      return;
-    }
-    postUser();
   };
   const handleClickLoginButton = () => {
     router.push("/login");
   };
-
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">
         <div className={cn("flex flex-col gap-6 items-center", className)}>
-          <Card className="overflow-hidden p-0 w-full max-w-5xl h-auto">
+          <Card className="overflow-hidden p-0 w-[1440px] h-[1024px]">
             <CardContent className="grid p-0 md:grid-cols-2 h-full w-full">
               <div className="flex items-center justify-center">
                 <form
@@ -69,45 +88,38 @@ export default function SignupPage({ className }) {
                     currentStep === 1
                       ? (e) => {
                           e.preventDefault();
-                          if (!formData.email) {
+                          if (!values.email) {
                             alert("Please enter your email");
                             return;
                           }
                           nextStep();
                         }
-                      : handleSubmit
+                      : formik.handleSubmit
                   }
                 >
-                  {currentStep > 1 && (
-                    <button
-                      type="button"
-                      variant="outline"
-                      onClick={prevStep}
-                      className="w-9 h-9 flex items-center justify-center border rounded-md"
-                    >
-                      <ChevronLeftIcon />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClickChevronButton}
+                    className="w-9 h-9 flex items-center justify-center border rounded-md cursor-pointer  hover:bg-gray-200 hover:text-black transition-colors duration-200"
+                  >
+                    <ChevronLeftIcon />
+                  </button>
                   <FieldGroup>
                     {currentStep === 1 && (
-                      <SignupForm
-                        formData={formData}
-                        setFormData={setFormData}
-                      />
+                      <SignupForm formik={formik} serverError={serverError} />
                     )}
-
-                    {currentStep === 2 && (
-                      <SignupForm2
-                        formData={formData}
-                        setFormData={setFormData}
-                      />
-                    )}
+                    {currentStep === 2 && <SignupForm2 formik={formik} />}
                     <Field>
-                      <Button type="submit" onClick={handleClickLetsgoButton}>
+                      <Button
+                        type="submit"
+                        disabled={errors.email || !values.email}
+                        className="cursor-pointer"
+                      >
                         Let&apos;s go
                       </Button>
                     </Field>
-                    <div className="text-red-600">{error}</div>
+
                     <FieldDescription className="text-center flex justify-center gap-1">
                       Already have an account?
                       <a
