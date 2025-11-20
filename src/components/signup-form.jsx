@@ -2,7 +2,7 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 export function SignupForm({ formik, serverError }) {
-  const { values, handleChange, handleBlur, errors, touched } = formik;
+  const { values, handleChange, handleBlur, errors } = formik;
 
   return (
     <div className="flex flex-col gap-6">
@@ -21,9 +21,9 @@ export function SignupForm({ formik, serverError }) {
           onChange={handleChange}
           onBlur={handleBlur}
         />
-        {serverError && errors.email && (
+        {errors.email && (
           <div className="text-red-500 font-inter text-sm font-normal leading-5">
-            {serverError}
+            {errors.email}
           </div>
         )}
       </Field>

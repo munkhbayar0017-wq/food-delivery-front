@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { toast } from "react-toastify";
 
 export default function SignupPage({ className }) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -52,11 +53,13 @@ export default function SignupPage({ className }) {
           email: values.email,
           password: values.password,
         });
-
+        console.log("Account success");
+        toast.success("Account created successfully!");
         router.push("/login");
       } catch (error) {
-        // console.log(error.response?.data);
-        setServerError(error.response?.data?.message || "User already exists");
+        console.log("User already exists");
+        toast.error(error.response?.data || "User already exists");
+        setServerError(error.response?.data);
       }
     },
   });

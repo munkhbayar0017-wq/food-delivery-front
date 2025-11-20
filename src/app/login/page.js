@@ -12,6 +12,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import ChevronLeftIcon from "../Icons/ChevronLeftIcon";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function LoginPage({ className }) {
   const router = useRouter();
@@ -36,9 +37,12 @@ export default function LoginPage({ className }) {
           password: values.password,
         });
         console.log("Push to homepage success");
+        toast.success("Login successful!");
         router.push("/");
       } catch (error) {
-        setServerError(error.response?.data?.message || "Incorrect password");
+        console.log(error.response?.data);
+        toast.error(error.response?.data || "User not found");
+        setServerError(error.response?.data);
       }
     },
   });
@@ -67,7 +71,7 @@ export default function LoginPage({ className }) {
                     <ChevronLeftIcon />
                   </div>
                   <FieldGroup>
-                    <LoginForm formik={formik} serverError={serverError} />
+                    <LoginForm formik={formik} />
                     <Field>
                       <Button
                         type="submit"
