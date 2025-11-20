@@ -6,6 +6,7 @@ import MenuIcon from "../Icons/MenuIcon";
 import { useState } from "react";
 import { Order } from "../../app/administrator/orders/Order";
 import { cn } from "@/lib/utils";
+import { FoodMenu } from "./foodmenu/FoodMenu";
 
 export function Administrator() {
   const [orders, setOrders] = useState(false);
@@ -16,8 +17,8 @@ export function Administrator() {
     setOrders(false);
   };
   return (
-    <div className="flex w-screen h-screen gap-6 items-center justify-center">
-      <div className="w-[205px] h-screen border flex flex-col items-center gap-10 px-5 py-9">
+    <div className="flex w-screen h-screen gap-6 items-center justify-start bg-[#F4F4F5]">
+      <div className="w-[205px] h-screen border flex flex-col items-center gap-10 px-5 py-9 bg-[#FFFFFF]">
         <div className="flex gap-2">
           <LogoIcon />
           <div>
@@ -32,7 +33,7 @@ export function Administrator() {
         <div className="flex flex-col gap-6">
           <button
             className={cn(
-              "w-[165px] h-10 flex gap-2.5 items-center justify-center rounded-full border",
+              "w-[165px] h-10 flex gap-2.5 items-center justify-center rounded-full border cursor-pointer",
               !orders
                 ? "bg-[#09090B] text-white"
                 : "bg-white  text-[#09090B] border-none"
@@ -46,7 +47,7 @@ export function Administrator() {
           </button>
           <button
             className={cn(
-              "w-[165px] h-10 flex gap-2.5 items-center justify-center rounded-full border",
+              "w-[165px] h-10 flex gap-2.5 items-center justify-center rounded-full border cursor-pointer",
               !orders
                 ? "bg-white text-[#09090B] border-none"
                 : "bg-[#09090B] text-white "
@@ -61,6 +62,7 @@ export function Administrator() {
         </div>
       </div>
       {orders && <Order />}
+      {!orders && <FoodMenu />}
     </div>
   );
 }

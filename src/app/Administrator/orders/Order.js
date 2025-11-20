@@ -185,7 +185,7 @@ export function Order() {
 
   return (
     <div className="flex w-screen h-screen gap-6 items-center justify-center">
-      <div className="w-[1170px]">
+      <div className="w-[1170px] bg-[#FFFFFF] rounded-t-md">
         <div className="flex items-center py-4 border-t border-r border-l rounded-t-md justify-between p-4">
           <div className="flex flex-col">
             <div className="font-bold text-xl leading-7 tracking-[-0.5px]">
