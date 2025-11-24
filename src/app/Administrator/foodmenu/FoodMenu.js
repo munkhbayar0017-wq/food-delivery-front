@@ -24,9 +24,7 @@ export function FoodMenu() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:168/foodauthenticationrouter/get-category"
-        );
+        const response = await axios.get("http://localhost:168/food-category");
         console.log("response iin data", response.data);
         setCategories(response.data);
       } catch (error) {
@@ -36,15 +34,11 @@ export function FoodMenu() {
     fetchCategories();
   }, []);
 
-  const handleAddCategoryButton = async (e) => {
-    e.preventDefault();
+  const handleAddCategoryButton = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:168/foodauthenticationrouter/post-category",
-        {
-          categoryName: newCategoryName,
-        }
-      );
+      const response = await axios.post("http://localhost:168/food-category", {
+        categoryName: newCategoryName,
+      });
       setCategories([...categories, response.data]);
       toast.success("Category added!");
       setNewCategoryName("");
@@ -74,7 +68,7 @@ export function FoodMenu() {
           <Dialog>
             <form>
               <DialogTrigger asChild>
-                <div className="flex w-full flex-wrap gap-2">
+                <div className="flex w-full flex-wrap gap-2 cursor-pointer">
                   <Badge
                     className="h-9 w-9 rounded-full flex items-center justify-center"
                     variant="destructive"
@@ -98,11 +92,17 @@ export function FoodMenu() {
                     onChange={(e) => setNewCategoryName(e.target.value)}
                   />
                 </div>
-                <DialogFooter>
+                <DialogFooter className="flex justify-end">
                   <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
+                    <Button variant="outline" className="cursor-pointer">
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button type="submit" onClick={handleAddCategoryButton}>
+                  <Button
+                    type="submit"
+                    onClick={handleAddCategoryButton}
+                    className="cursor-pointer"
+                  >
                     Add category
                   </Button>
                 </DialogFooter>
