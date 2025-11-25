@@ -17,7 +17,7 @@ export function Administrator() {
     setOrders(false);
   };
   return (
-    <div className="flex w-screen h-screen gap-6 items-center justify-start bg-[#F4F4F5]">
+    <div className="flex w-screen  gap-6 items-center justify-start bg-[#F4F4F5]">
       <div className="w-[205px] h-screen border flex flex-col items-center gap-10 px-5 py-9 bg-[#FFFFFF]">
         <div className="flex gap-2">
           <LogoIcon />

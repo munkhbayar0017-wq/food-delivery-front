@@ -20,6 +20,9 @@ import Foods from "./Foods";
 export function FoodMenu() {
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [foodCounts, setFoodCounts] = useState({});
+  console.log("categories", categories);
+  console.log("food count", foodCounts);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -48,6 +51,13 @@ export function FoodMenu() {
     }
   };
 
+  const handleFoodsChange = (categoryId, count) => {
+    setFoodCounts((prev) => ({
+      ...prev,
+      [categoryId]: count,
+    }));
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col w-full h-44 border rounded-xl p-6 gap-4 bg-[#FFFFFF]">
@@ -60,7 +70,7 @@ export function FoodMenu() {
               <Badge key={category._id} variant="outline" className="h-9">
                 {category.categoryName}
                 <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
-                  {category.count || 0}
+                  {foodCounts[category._id] || 0}
                 </Badge>
               </Badge>
             ))}
@@ -111,7 +121,22 @@ export function FoodMenu() {
           </Dialog>
         </div>
       </div>
-      <Foods />
+      {categories.map((category) => (
+        <div
+          key={category._id}
+          className="flex flex-col w-full border rounded-xl p-6 gap-4 bg-[#FFFFFF]"
+        >
+          <div className="text-[#09090B] font-inter text-[20px] font-semibold leading-7 tracking-[-0.5px]">
+            {category.categoryName} ({foodCounts[category._id] || 0})
+          </div>
+          <Foods
+            categoryId={category._id}
+            categoryName={category.categoryName}
+            categories={categories}
+            onFoodsChange={(count) => handleFoodsChange(category._id, count)}
+          />
+        </div>
+      ))}
     </div>
   );
 }
