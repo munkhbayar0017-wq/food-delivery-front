@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import PlusIcon from "@/app/Icons/PlusIcon";
 import {
@@ -39,11 +40,50 @@ export default function Foods({
   const [price, setPrice] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [foods, setFoods] = useState([]);
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("");
 
-  console.log("foods", foods);
+  const [image, setImage] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const UPLOAD_PRESET = "food-delivery";
+  const CLOUD_NAME = "dyntg7qqu";
+
+  const UploadImage = async (file) => {
+    console.log("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error("Cloudinary upload failed:", error);
+    }
+  };
+
+  const handleUploadImage = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setImageLoading(true);
+    try {
+      const url = await UploadImage(file);
+      setImage(url);
+    } catch (err) {
+      console.log("Failed to upload logo: " + err.message);
+    } finally {
+      setImageLoading(false);
+    }
+  };
 
   const fetchFoods = async () => {
     try {
@@ -67,6 +107,7 @@ export default function Foods({
         price,
         ingredients,
         category: categoryId,
+        image: image,
       });
       console.log("response", response);
 
@@ -80,6 +121,7 @@ export default function Foods({
       setFoodName("");
       setPrice("");
       setIngredients("");
+      setImage("");
       toast.success("Dish added successfully!");
     } catch (error) {
       console.error(error);
@@ -94,10 +136,17 @@ export default function Foods({
         price,
         ingredients,
         category: selectedCategory || categoryId,
+        image: image,
       });
 
       toast.success("Dish changed successfully!");
       fetchFoods();
+
+      setFoodName("");
+      setPrice("");
+      setIngredients("");
+      setImage("");
+      setSelectedCategory("");
     } catch (error) {
       console.error(error);
       toast.error("Failed to save changes");
@@ -125,7 +174,6 @@ export default function Foods({
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      {/* MAP guuh heseg */}
       <Dialog>
         <form>
           <DialogTrigger asChild>
@@ -184,18 +232,24 @@ export default function Foods({
                 <Label htmlFor="image">Food image</Label>
                 <label
                   htmlFor="image"
-                  className="h-[200px] object-cover border-2 border-dashed border-[#2563EB]/50 bg-[#2563EB]/20 rounded-lg flex flex-col items-center justify-center gap-3 cursor-pointer"
+                  className="relative h-[200px] object-cover border-2 border-dashed border-[#2563EB]/50 bg-[#2563EB]/20 rounded-lg flex flex-col items-center justify-center gap-3 cursor-pointer"
                 >
-                  {imagePreview && (
+                  {imageLoading && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                      <p className="text-white font-medium text-sm">
+                        Uploading...
+                      </p>
+                    </div>
+                  )}
+                  {image && !imageLoading && (
                     <Image
-                      src={imagePreview}
+                      src={image}
                       alt="Preview"
-                      width={200}
-                      height={200}
-                      className="flex inset-0 w-full h-[200px] object-cover bg-center bg-cover rounded-lg"
+                      fill
+                      className="object-cover rounded-lg"
                     />
                   )}
-                  {!imagePreview && (
+                  {!image && !imageLoading && (
                     <>
                       <div className="w-8 h-8 flex items-center bg-[#FFFFFF] rounded-full justify-center z-10">
                         <FileIcon />
@@ -210,11 +264,8 @@ export default function Foods({
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      setImage(file);
-                      setImagePreview(URL.createObjectURL(file));
-                    }}
+                    onChange={handleUploadImage}
+                    disabled={imageLoading}
                   />
                 </label>
               </div>
@@ -243,17 +294,26 @@ export default function Foods({
           key={food._id}
           className="w-[270px] h-[241px] border rounded-xl p-4 flex flex-col gap-5"
         >
-          <div className="h-[129px] rounded-xl bg-amber-700 flex items-end justify-end p-5">
+          <div className="relative h-[129px] rounded-xl flex items-end justify-end">
+            {food.image && (
+              <Image
+                src={food.image}
+                alt={food.foodName}
+                fill
+                className="object-cover rounded-xl"
+              />
+            )}
             <Dialog>
               <form>
                 <DialogTrigger asChild>
                   <div
-                    className="bg-white rounded-full w-11 h-11 flex items-center justify-center cursor-pointer"
+                    className="absolute right-2 bottom-2 bg-white rounded-full w-11 h-11 flex items-center justify-center cursor-pointer"
                     onClick={() => {
                       setFoodName(food.foodName);
                       setPrice(food.price);
                       setIngredients(food.ingredients);
                       setSelectedCategory(food.category);
+                      setImage(food.image || "");
                     }}
                   >
                     <EditIcon />
@@ -329,24 +389,45 @@ export default function Foods({
                     </div>
 
                     <div className="flex gap-3 items-start">
-                      <Label htmlFor="image" className="w-[120px]">
+                      <Label htmlFor="edit-image" className="w-[120px]">
                         Image
                       </Label>
                       <label
-                        htmlFor="image"
-                        className="h-[116px] w-full border-2 border-dashed border-[#2563EB]/50 bg-[#2563EB]/20 rounded-lg flex flex-col items-center justify-center gap-3 cursor-pointer"
+                        htmlFor="edit-image"
+                        className="h-[116px] w-full border-2 border-dashed border-[#2563EB]/50 bg-[#2563EB]/20 rounded-lg flex flex-col items-center justify-center gap-3 cursor-pointer relative overflow-hidden"
                       >
-                        <div className="w-8 h-8 flex items-center bg-[#FFFFFF] rounded-full justify-center">
-                          <FileIcon />
-                        </div>
-                        <p className="text-gray-600 text-center">
-                          Choose a file or drag & drop it here
-                        </p>
+                        {imageLoading && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                            <p className="text-white font-medium text-sm">
+                              Uploading...
+                            </p>
+                          </div>
+                        )}
+                        {image && !imageLoading && (
+                          <Image
+                            src={image}
+                            alt="Preview"
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                        )}
+                        {!image && !imageLoading && (
+                          <>
+                            <div className="w-8 h-8 flex items-center bg-[#FFFFFF] rounded-full justify-center">
+                              <FileIcon />
+                            </div>
+                            <p className="text-gray-600 text-center text-sm">
+                              Choose a file or drag & drop it here
+                            </p>
+                          </>
+                        )}
                         <Input
-                          id="image"
+                          id="edit-image"
                           type="file"
                           accept="image/*"
                           className="hidden"
+                          onChange={handleUploadImage}
+                          disabled={imageLoading}
                         />
                       </label>
                     </div>
@@ -381,7 +462,7 @@ export default function Foods({
                 {food.foodName}
               </div>
               <div className="text-[#09090B] font-inter text-xs font-normal leading-4">
-                {food.price}tugrik
+                {food.price}₮
               </div>
             </div>
             <div className="text-[#09090B] font-inter text-xs font-normal leading-4">

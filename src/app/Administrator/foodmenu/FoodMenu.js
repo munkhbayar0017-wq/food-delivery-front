@@ -51,6 +51,20 @@ export function FoodMenu() {
     }
   };
 
+  const handleDeleteButton = async (id) => {
+    console.log(id);
+    try {
+      const response = await axios.delete(
+        `http://localhost:168/food-category/${id}`
+      );
+      toast.success("Category deleted successfully!");
+      fetchFoods();
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete category");
+    }
+  };
+
   const handleFoodsChange = (categoryId, count) => {
     setFoodCounts((prev) => ({
       ...prev,
@@ -67,12 +81,27 @@ export function FoodMenu() {
         <div className="flex items-center gap-2 ">
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <Badge key={category._id} variant="outline" className="h-9">
-                {category.categoryName}
-                <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
-                  {foodCounts[category._id] || 0}
+              <div key={category._id} className="group">
+                <Badge
+                  variant="outline"
+                  className="h-9 flex items-center justify-end gap-2 cursor-pointer"
+                >
+                  {category.categoryName}
+                  <Badge
+                    className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums text-center
+                     transition-all duration-150 group-hover:opacity-0"
+                  >
+                    {foodCounts[category._id] || 0}
+                  </Badge>
+                  <Badge
+                    onClick={() => handleDeleteButton(category._id)}
+                    className="absolute h-5 min-w-5 rounded-full px-1 text-center bg-red-600 text-white
+                     opacity-0 group-hover:opacity-100 transition-all duration-150 cursor-pointer"
+                  >
+                    ✖
+                  </Badge>
                 </Badge>
-              </Badge>
+              </div>
             ))}
           </div>
           <Dialog>
