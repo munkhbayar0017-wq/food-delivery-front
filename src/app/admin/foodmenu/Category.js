@@ -15,35 +15,38 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Foods from "./Foods";
+import CategoriesMap from "@/app/_components/CategoriesMap";
 
-export function FoodMenu() {
+export function Categories() {
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [foodCounts, setFoodCounts] = useState({});
-  console.log("categories", categories);
-  console.log("food count", foodCounts);
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:168/food-category");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+      toast.error("Failed to fetch categories");
+    }
+  };
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:168/food-category");
-        console.log("response iin data", response.data);
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
-      }
-    };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCategories();
   }, []);
 
   const handleAddCategoryButton = async () => {
+    if (!newCategoryName.trim()) {
+      toast.error("Please enter category name");
+      return;
+    }
     try {
       const response = await axios.post("http://localhost:168/food-category", {
         categoryName: newCategoryName,
       });
       setCategories([...categories, response.data]);
-      toast.success("Category added!");
+      toast.success("Category added succesfully!");
       setNewCategoryName("");
     } catch (error) {
       console.error(error);
@@ -52,7 +55,6 @@ export function FoodMenu() {
   };
 
   const handleDeleteButton = async (id) => {
-    console.log(id);
     try {
       const response = await axios.delete(
         `http://localhost:168/food-category/${id}`
@@ -60,16 +62,8 @@ export function FoodMenu() {
       toast.success("Category deleted successfully!");
       fetchFoods();
     } catch (error) {
-      console.log(error);
       toast.error("Failed to delete category");
     }
-  };
-
-  const handleFoodsChange = (categoryId, count) => {
-    setFoodCounts((prev) => ({
-      ...prev,
-      [categoryId]: count,
-    }));
   };
 
   return (
@@ -137,35 +131,26 @@ export function FoodMenu() {
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button
-                    type="submit"
-                    onClick={handleAddCategoryButton}
-                    className="cursor-pointer"
-                  >
-                    Add category
-                  </Button>
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      onClick={handleAddCategoryButton}
+                      className="cursor-pointer"
+                    >
+                      Add category
+                    </Button>
+                  </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </form>
           </Dialog>
         </div>
       </div>
-      {categories.map((category) => (
-        <div
-          key={category._id}
-          className="flex flex-col w-full border rounded-xl p-6 gap-4 bg-[#FFFFFF]"
-        >
-          <div className="text-[#09090B] font-inter text-[20px] font-semibold leading-7 tracking-[-0.5px]">
-            {category.categoryName} ({foodCounts[category._id] || 0})
-          </div>
-          <Foods
-            categoryId={category._id}
-            categoryName={category.categoryName}
-            categories={categories}
-            onFoodsChange={(count) => handleFoodsChange(category._id, count)}
-          />
-        </div>
-      ))}
+      <CategoriesMap
+        categories={categories}
+        foodCounts={foodCounts}
+        setFoodCounts={setFoodCounts}
+      />
     </div>
   );
 }
