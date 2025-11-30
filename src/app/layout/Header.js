@@ -1,7 +1,10 @@
 "use client";
 
+import LocationIcon from "../Icons/LocationIcon";
 import LogoIcon from "../Icons/LogoIcon";
 import { useRouter } from "next/navigation";
+import ChevronRightIcon from "../Icons/ChevronRightIcon";
+import CartIcon from "../Icons/CartIcon";
 
 export function Header() {
   const router = useRouter();
@@ -28,7 +31,21 @@ export function Header() {
           </div>
         </div>
         <div className="flex gap-3">
-          <button
+          <div className="bg-[#FFFFFF] rounded-full flex gap-1 items-center justify-center h-9 py-2 px-3">
+            <LocationIcon />
+            <div className="text-red-500 font-inter text-xs font-normal leading-4">
+              Delivery address:
+            </div>
+            <div className="text-[#71717A] font-inter text-xs font-normal leading-4">
+              Add Location
+            </div>
+            <ChevronRightIcon />
+          </div>
+          <div>
+            <CartIcon />
+          </div>
+          <div></div>
+          {/* <button
             className="w-[75px] h-9 bg-[#F4F4F5] text-[#18181B] rounded-full font-inter text-[14px] font-medium leading-5 cursor-pointer hover:bg-gray-300 hover:text-black transition-colors duration-200"
             onClick={handleClickSignupButton}
           >
@@ -39,7 +56,7 @@ export function Header() {
             onClick={handleClickLoginButton}
           >
             Log in
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ import { Header } from "./layout/Header";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import { toast } from "react-toastify";
+import { FoodDetail } from "./_components/FoodDetail";
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
@@ -67,6 +69,8 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // const handleClickRedPlusButton = () => {};
+
   if (loading) {
     return (
       <div className="flex flex-col">
@@ -102,19 +106,20 @@ export default function Home() {
                         key={food._id}
                         className="flex flex-col w-[397px] h-[342px] rounded-xl p-4 gap-5 border bg-[#FFFFFF]"
                       >
-                        <div className="relative w-[365px] h-[210px] rounded-xl bg-amber-700">
-                          {food.image ? (
-                            <Image
-                              src={food.image}
-                              alt={food.foodName}
-                              fill
-                              className="object-cover rounded-xl"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-amber-700 text-white">
-                              No Image
-                            </div>
-                          )}
+                        <div className="relative flex items-end justify-end w-[365px] h-[210px] rounded-xl bg-amber-700 p-15">
+                          <FoodDetail
+                            foodName={food.foodName}
+                            price={food.price}
+                            ingredients={food.ingredients}
+                            image={food.image}
+                          />
+
+                          <Image
+                            src={food.image}
+                            alt={food.foodName}
+                            fill
+                            className="object-cover rounded-xl"
+                          />
                         </div>
 
                         <div className="flex justify-between">
