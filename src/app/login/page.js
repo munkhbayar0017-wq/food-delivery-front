@@ -32,10 +32,15 @@ export default function LoginPage({ className }) {
     onSubmit: async (values) => {
       try {
         setServerError("");
-        await axios.post("http://localhost:168/authentication/login", {
-          email: values.email,
-          password: values.password,
-        });
+        const response = await axios.post(
+          "http://localhost:168/authentication/login",
+          {
+            email: values.email,
+            password: values.password,
+          }
+        );
+        console.log("response", response.data.token);
+        localStorage.setItem("token", response.data.token);
         console.log("Push to homepage success");
         toast.success("Login successful!");
         router.push("/");

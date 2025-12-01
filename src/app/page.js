@@ -12,6 +12,7 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
   const [foodsByCategory, setFoodsByCategory] = useState({});
   const [loading, setLoading] = useState(true);
+  const [orderItems, setOrderItems] = useState([]);
 
   const fetchCategories = async () => {
     try {
@@ -84,7 +85,7 @@ export default function Home() {
   }
   return (
     <div className="flex flex-col">
-      <Header />
+      <Header orderItems={orderItems} />
       <div className="w-screen bg-[#404040] flex flex-col items-center justify-cente">
         <div className="w-[1440px] h-[570px] bg-[url('/Image.png')] bg-cover bg-center"></div>
         <div className="p-22">
@@ -112,8 +113,9 @@ export default function Home() {
                             price={food.price}
                             ingredients={food.ingredients}
                             image={food.image}
+                            foodId={food._id}
+                            setOrderItems={setOrderItems}
                           />
-
                           <Image
                             src={food.image}
                             alt={food.foodName}

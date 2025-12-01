@@ -77,14 +77,19 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
 
   const handleSaveChangesButton = async (id) => {
     try {
-      const response = await axios.put("http://localhost:168/food", {
-        id,
-        foodName,
-        price,
-        ingredients,
-        category: selectedCategory,
-        image: image,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://localhost:168/food",
+        {
+          id,
+          foodName,
+          price,
+          ingredients,
+          category: selectedCategory,
+          image: image,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       toast.success("Dish changed successfully!");
       onUpdated();
@@ -102,7 +107,10 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
   const handleDeleteButton = async (id) => {
     console.log(id);
     try {
-      const response = await axios.delete(`http://localhost:168/food/${id}`);
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(`http://localhost:168/food/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Dish deleted successfully!");
       onDeleted();
     } catch (error) {

@@ -16,7 +16,14 @@ import { useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 
-export function FoodDetail({ foodName, price, ingredients, image }) {
+export function FoodDetail({
+  foodName,
+  price,
+  ingredients,
+  image,
+  foodId,
+  setOrderItems,
+}) {
   const [count, setCount] = useState(1);
   const handleClickMinusButton = () => {
     if (count === 1) {
@@ -24,10 +31,15 @@ export function FoodDetail({ foodName, price, ingredients, image }) {
     }
     setCount(count - 1);
   };
+
   const handleClickPlusButton = () => {
     setCount(count + 1);
   };
+
   const handleClickAddToCartButton = () => {
+    console.log({ food: foodId, quantity: count });
+
+    setOrderItems((prev) => [...prev, { food: foodId, quantity: count }]);
     toast.success("Food is being added to the cart!");
   };
   return (

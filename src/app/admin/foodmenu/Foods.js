@@ -97,13 +97,19 @@ export default function Foods({
     }
 
     try {
-      const response = await axios.post("http://localhost:168/food", {
-        foodName,
-        price,
-        ingredients,
-        category: categoryId,
-        image: image,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:168/food",
+        {
+          foodName,
+          price,
+          ingredients,
+          category: categoryId,
+          image: image,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("token--------", token);
       console.log("response", response);
 
       const updatedFoods = [...foods, response.data];

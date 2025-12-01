@@ -42,9 +42,14 @@ export function Categories() {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:168/food-category", {
-        categoryName: newCategoryName,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:168/food-category",
+        {
+          categoryName: newCategoryName,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setCategories([...categories, response.data]);
       toast.success("Category added succesfully!");
       setNewCategoryName("");
@@ -56,8 +61,12 @@ export function Categories() {
 
   const handleDeleteButton = async (id) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.delete(
-        `http://localhost:168/food-category/${id}`
+        `http://localhost:168/food-category/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
       toast.success("Category deleted successfully!");
       fetchFoods();
