@@ -114,6 +114,7 @@ export default function Home() {
                             ingredients={food.ingredients}
                             image={food.image}
                             foodId={food._id}
+                            orderItems={orderItems}
                             setOrderItems={setOrderItems}
                           />
                           <Image

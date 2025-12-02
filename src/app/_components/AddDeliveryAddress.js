@@ -11,8 +11,26 @@ import {
 import { Input } from "@/components/ui/input";
 import LocationIcon from "../Icons/LocationIcon";
 import ChevronRightIcon from "../Icons/ChevronRightIcon";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 export function AddDeliveryAddress() {
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    const savedLocation = localStorage.getItem("location");
+    if (savedLocation) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLocation(savedLocation);
+    }
+  }, []);
+
+  const handleClickDeliverHereButton = () => {
+    if (location.trim() !== "") {
+      localStorage.setItem("location", location);
+      toast.success("Delivery address saved!");
+    }
+  };
   return (
     <Dialog>
       <form>
@@ -22,9 +40,15 @@ export function AddDeliveryAddress() {
             <div className="text-red-500 font-inter text-xs font-normal leading-4">
               Delivery address:
             </div>
-            <div className="text-[#71717A] font-inter text-xs font-normal leading-4">
-              Add Location
-            </div>
+            {location === "" ? (
+              <div className="text-[#71717A] font-inter text-xs font-normal leading-4">
+                Add Location
+              </div>
+            ) : (
+              <div className="text-[#71717A] font-inter text-xs font-normal leading-4">
+                {location}
+              </div>
+            )}
             <ChevronRightIcon />
           </div>
         </DialogTrigger>
@@ -39,6 +63,8 @@ export function AddDeliveryAddress() {
                 name="name"
                 placeholder="Please share your complete address"
                 className="h-20"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               />
             </div>
           </div>
@@ -47,7 +73,9 @@ export function AddDeliveryAddress() {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button type="submit">Deliver Here</Button>
+              <Button type="submit" onClick={handleClickDeliverHereButton}>
+                Deliver Here
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

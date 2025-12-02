@@ -22,6 +22,7 @@ export function FoodDetail({
   ingredients,
   image,
   foodId,
+  orderItems,
   setOrderItems,
 }) {
   const [count, setCount] = useState(1);
@@ -40,8 +41,13 @@ export function FoodDetail({
     console.log({ food: foodId, quantity: count });
 
     setOrderItems((prev) => [...prev, { food: foodId, quantity: count }]);
+    localStorage.setItem(
+      "orders",
+      JSON.stringify([...orderItems, { food: foodId, quantity: count }])
+    );
     toast.success("Food is being added to the cart!");
   };
+
   return (
     <Dialog
       onOpenChange={(isOpen) => {
