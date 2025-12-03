@@ -17,9 +17,8 @@ import FoodsDetailMap from "./FoodsDetailMap";
 import LogoIcon from "../Icons/LogoIcon";
 import { LoginFirst } from "./LoginFirst";
 
-export function OrderDetail() {
-  const localStorageOrders = window.localStorage.getItem("orders");
-  const orderItems = JSON.parse(localStorageOrders);
+export function OrderDetail({ open, setOpen }) {
+  const [orderItems, setOrderItems] = useState([]);
   const [active, setActive] = useState("Cart");
   const [foodsDetail, setFoodsDetail] = useState([]);
   const [value, setValue] = useState("");
@@ -31,10 +30,17 @@ export function OrderDetail() {
   const handleClickCartButton = () => {
     setActive("Cart");
   };
-  console.log("orderItems------ from order datil", orderItems);
-  const fetchFoods = async () => {
+  const fetchFoods = async (orders) => {
+    console.log("this is order", orders);
+    if (!orders || orders.length === 0) {
+      setFoodsDetail([]);
+      return;
+    }
+
     try {
-      const promises = orderItems.map((items) => {
+      const validOrders = orders.filter((item) => item && item.food);
+
+      const promises = validOrders.map((items) => {
         return axios.get(`http://localhost:168/food/foodId/${items.food}`);
       });
       const response = await Promise.all(promises);
@@ -43,7 +49,7 @@ export function OrderDetail() {
         response.map((res) => {
           return {
             ...res.data,
-            quantity: orderItems.find((item) => item.food === res.data._id)
+            quantity: validOrders.find((item) => item.food === res.data._id)
               .quantity,
           };
         })
@@ -53,19 +59,33 @@ export function OrderDetail() {
     }
   };
   useEffect(() => {
-    if (orderItems?.length > 0) {
-      fetchFoods();
+    if (open) {
+      console.log("hello this is running");
+      const localStorageOrders = window.localStorage.getItem("orders");
+      if (localStorageOrders) {
+        const parsedArray = JSON.parse(localStorageOrders);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setOrderItems(parsedArray);
+        if (parsedArray && parsedArray.length > 0) {
+          fetchFoods(parsedArray);
+        }
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [open]);
 
-  const totalPrice = foodsDetail.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  console.log("foodsDetail", foodsDetail);
+  const totalPrice = orderItems.reduce((sum, item) => {
+    const food = foodsDetail.find((f) => f._id === item.food);
+    if (food) {
+      return sum + food.price * item.quantity;
+    }
+    return sum;
+  }, 0);
+
+  const handleRemoveFood = (foodId) => {
+    setFoodsDetail(foodsDetail.filter((food) => food._id !== foodId));
+  };
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#FFFFFF] cursor-pointer hover:bg-gray-300 hover:text-black transition-colors duration-200">
           <CartIcon />
@@ -121,6 +141,8 @@ export function OrderDetail() {
                           image={food.image}
                           orderItems={orderItems}
                           foodId={food._id}
+                          setOrderItems={setOrderItems}
+                          onRemove={handleRemoveFood}
                         />
                       ))}
                     </div>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import MinusIcon from "../Icons/MinusIcon";
 import BlackPlusIcon from "../Icons/BlackPlusIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RedXIcon from "../Icons/RedXIcon";
 const FoodsDetailMap = ({
   foodName,
@@ -10,33 +10,61 @@ const FoodsDetailMap = ({
   image,
   orderItems,
   foodId,
+  setOrderItems,
+  onRemove,
 }) => {
+  const item = orderItems?.find((i) => i.food === foodId);
+  const quantity = item?.quantity ?? 1;
+
   const [count, setCount] = useState(1);
-  const [isDeleted, setIsDeleted] = useState(false);
+
+  useEffect(() => {
+    setCount(quantity);
+  }, [quantity]);
+
   const handleClickMinusButton = () => {
     if (count === 1) {
       return;
     }
-    setCount(count - 1);
+    const newCount = count - 1;
+    setCount(newCount);
+    updateQuantity(newCount);
   };
   const handleClickPlusButton = () => {
-    setCount(count + 1);
+    const newCount = count + 1;
+    setCount(newCount);
+    updateQuantity(newCount);
   };
-  const handleClickCloseButton = () => {
-    setIsDeleted(true);
-  };
-  const item = orderItems.find((i) => i.food === foodId);
-  const quantity = item?.quantity ?? 0;
 
-  console.log("orderItems in foods details map quantity", orderItems);
+  const updateQuantity = (newQuantity) => {
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const updatedOrders = orders.map((order) =>
+      order.food === foodId ? { ...order, quantity: newQuantity } : order
+    );
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+    setOrderItems(updatedOrders);
+  };
+
+  const handleClickCloseButton = () => {
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const filteredIds = orders.filter((order) => order.food !== foodId);
+    localStorage.setItem("orders", JSON.stringify(filteredIds));
+    setOrderItems(filteredIds);
+
+    if (onRemove) {
+      onRemove(foodId);
+    }
+  };
+
   return (
     <div className="relative flex gap-2.5 w-full h-[120px]">
       <div
-        className="absolute z-50 left-100 flex items-center justify-center w-9 h-9 border border-[#EF4444] rounded-full"
+        className="absolute z-50 left-100 flex items-center justify-center w-9 h-9 border border-[#EF4444] rounded-full cursor-pointer hover:bg-[#EF4444]/10 hover:border-[#DC2626] transition-all duration-200"
         onClick={handleClickCloseButton}
       >
         <RedXIcon />
       </div>
+
       <div className="relative w-[124px] h-full rounded-xl">
         <Image
           src={image}
@@ -69,7 +97,7 @@ const FoodsDetailMap = ({
                 <MinusIcon />
               </button>
               <div className="text-[#09090B] font-inter text-[18px] font-semibold leading-7 flex items-center justify-center">
-                {quantity}
+                {count}
               </div>
               <button
                 className="flex items-center justify-center w-11 h-11 bg-white border border-[#09090B] cursor-pointer rounded-full hover:bg-[#F4F4F5] transition"
@@ -79,7 +107,7 @@ const FoodsDetailMap = ({
               </button>
             </div>
             <div className="text-[#09090B] font-inter text-[16px] font-semibold leading-7">
-              {price}₮
+              {price * count}₮
             </div>
           </div>
         </div>

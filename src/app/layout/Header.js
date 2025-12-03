@@ -6,9 +6,11 @@ import CartIcon from "../Icons/CartIcon";
 import UserIcon from "../Icons/UserIcon";
 import { AddDeliveryAddress } from "../_components/AddDeliveryAddress";
 import { OrderDetail } from "../_components/OrderDetail";
+import { useState } from "react";
 
 export function Header({ orderItems }) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const handleClickSignupButton = () => {
     router.push("/signup");
   };
@@ -33,7 +35,7 @@ export function Header({ orderItems }) {
         </div>
         <div className="flex gap-3">
           <AddDeliveryAddress />
-          <OrderDetail orderItems={orderItems} />
+          <OrderDetail setOpen={setOpen} open={open} />
           <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200">
             <UserIcon />
           </div>
