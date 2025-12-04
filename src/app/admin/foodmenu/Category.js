@@ -12,46 +12,24 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import CategoriesMap from "@/app/_components/CategoriesMap";
+import { useFoodCategory } from "@/app/_provider/FoodCategory";
 
 export function Categories() {
-  const [categories, setCategories] = useState([]);
+  const { categories, deleteCategories, postCategories } = useFoodCategory();
   const [newCategoryName, setNewCategoryName] = useState("");
   const [foodCounts, setFoodCounts] = useState({});
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("http://localhost:168/food-category");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Failed to fetch categories", error);
-      toast.error("Failed to fetch categories");
-    }
-  };
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCategories();
-  }, []);
 
   const handleAddCategoryButton = async () => {
     if (!newCategoryName.trim()) {
       toast.error("Please enter category name");
       return;
     }
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:168/food-category",
-        {
-          categoryName: newCategoryName,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setCategories([...categories, response.data]);
-      toast.success("Category added succesfully!");
+      await postCategories(newCategoryName);
       setNewCategoryName("");
     } catch (error) {
       console.error(error);
@@ -60,19 +38,7 @@ export function Categories() {
   };
 
   const handleDeleteButton = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete(
-        `http://localhost:168/food-category/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      toast.success("Category deleted successfully!");
-      fetchFoods();
-    } catch (error) {
-      toast.error("Failed to delete category");
-    }
+    deleteCategories(id);
   };
 
   return (

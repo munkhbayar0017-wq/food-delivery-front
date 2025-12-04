@@ -109,7 +109,7 @@ export default function Foods({
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("token--------", token);
+      console.log("token", token);
       console.log("response", response);
 
       const updatedFoods = [...foods, response.data];
