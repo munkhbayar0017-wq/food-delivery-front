@@ -27,8 +27,10 @@ import DeleteIcon from "../Icons/DeleteIcon";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { useFoodCategory } from "../_provider/FoodCategory";
 
 export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
+  const { updateFood, deleteFood, uploadImage } = useFoodCategory();
   const [foodName, setFoodName] = useState(food?.foodName);
   const [price, setPrice] = useState(food?.price);
   const [ingredients, setIngredients] = useState(food?.ingredients);
@@ -36,29 +38,29 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
   const [selectedCategory, setSelectedCategory] = useState(food?.category);
   const [imageLoading, setImageLoading] = useState(false);
 
-  const UPLOAD_PRESET = "food-delivery";
-  const CLOUD_NAME = "dyntg7qqu";
+  // const UPLOAD_PRESET = "food-delivery";
+  // const CLOUD_NAME = "dyntg7qqu";
 
-  const UploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
+  // const UploadImage = async (file) => {
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("upload_preset", UPLOAD_PRESET);
 
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  //   try {
+  //     const response = await fetch(
+  //       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+  //       {
+  //         method: "POST",
+  //         body: formData,
+  //       }
+  //     );
 
-      const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      console.error("Cloudinary upload failed:", error);
-    }
-  };
+  //     const data = await response.json();
+  //     return data.secure_url;
+  //   } catch (error) {
+  //     console.error("Cloudinary upload failed:", error);
+  //   }
+  // };
 
   const handleUploadImage = async (event) => {
     const file = event.target.files[0];
@@ -66,7 +68,7 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
 
     setImageLoading(true);
     try {
-      const url = await UploadImage(file);
+      const url = await uploadImage(file);
       setImage(url);
     } catch (err) {
       console.log("Failed to upload logo: " + err.message);
@@ -77,22 +79,17 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
 
   const handleSaveChangesButton = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        "http://localhost:168/food",
-        {
-          id,
-          foodName,
-          price,
-          ingredients,
-          category: selectedCategory,
-          image: image,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await updateFood(id, {
+        foodName,
+        price,
+        ingredients,
+        category: selectedCategory,
+        image: image,
+      });
 
-      toast.success("Dish changed successfully!");
-      onUpdated();
+      if (onUpdated) {
+        onUpdated();
+      }
 
       setFoodName("");
       setPrice("");
@@ -101,21 +98,17 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
       setSelectedCategory("");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to save changes");
     }
   };
   const handleDeleteButton = async (id) => {
     console.log(id);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete(`http://localhost:168/food/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Dish deleted successfully!");
-      onDeleted();
+      await deleteFood(id);
+      if (onDeleted) {
+        onDeleted();
+      }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to delete dish");
     }
   };
 

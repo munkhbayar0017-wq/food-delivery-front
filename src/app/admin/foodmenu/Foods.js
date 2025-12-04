@@ -14,12 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import FileIcon from "@/app/Icons/FileIcon";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import * as React from "react";
 import Image from "next/image";
 import FoodsMap from "@/app/_components/FoodsMap";
+import { useFoodCategory } from "@/app/_provider/FoodCategory";
 
 export default function Foods({
   categoryId,
@@ -27,37 +27,13 @@ export default function Foods({
   onFoodsChange,
   categories,
 }) {
+  const { fetchFoods, postFood, uploadImage } = useFoodCategory();
   const [foodName, setFoodName] = useState("");
   const [price, setPrice] = useState("");
   const [ingredients, setIngredients] = useState("");
-  const [foods, setFoods] = useState([]);
+  const [localFoods, setLocalFoods] = useState([]);
   const [image, setImage] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
-
-  const UPLOAD_PRESET = "food-delivery";
-  const CLOUD_NAME = "dyntg7qqu";
-
-  const UploadImage = async (file) => {
-    console.log("file", file);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      console.error("Cloudinary upload failed:", error);
-    }
-  };
 
   const handleUploadImage = async (event) => {
     const file = event.target.files[0];
@@ -65,28 +41,22 @@ export default function Foods({
 
     setImageLoading(true);
     try {
-      const url = await UploadImage(file);
+      const url = await uploadImage(file);
       setImage(url);
     } catch (err) {
       console.log("Failed to upload logo: " + err.message);
-      toast.error("Failed to upload image");
     } finally {
       setImageLoading(false);
     }
   };
 
-  const fetchFoods = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:168/food/${categoryId}`
-      );
-      setFoods(response.data);
-      console.log("response.data", response.data);
+  const loadFoods = async () => {
+    if (categoryId) {
+      const data = await fetchFoods(categoryId);
+      setLocalFoods(data);
       if (onFoodsChange) {
-        onFoodsChange(response.data.length);
+        onFoodsChange(data.length);
       }
-    } catch (error) {
-      console.error("Failed to fetch food", error);
     }
   };
 
@@ -97,44 +67,26 @@ export default function Foods({
     }
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:168/food",
-        {
-          foodName,
-          price,
-          ingredients,
-          category: categoryId,
-          image: image,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log("token", token);
-      console.log("response", response);
-
-      const updatedFoods = [...foods, response.data];
-      setFoods(updatedFoods);
-
-      if (onFoodsChange) {
-        onFoodsChange(updatedFoods.length);
-      }
+      await postFood({
+        foodName,
+        price,
+        ingredients,
+        category: categoryId,
+        image: image,
+      });
+      await loadFoods();
 
       setFoodName("");
       setPrice("");
       setIngredients("");
       setImage("");
-      toast.success("Dish added successfully!");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add dish");
     }
   };
 
   useEffect(() => {
-    if (categoryId) {
-      fetchFoods();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadFoods();
   }, [categoryId]);
 
   return (
@@ -255,7 +207,7 @@ export default function Foods({
         </form>
       </Dialog>
 
-      {foods.map((food) => (
+      {localFoods.map((food) => (
         <FoodsMap
           key={food._id}
           food={food}
