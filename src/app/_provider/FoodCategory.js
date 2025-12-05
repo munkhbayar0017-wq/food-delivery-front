@@ -29,6 +29,7 @@ export const FoodCategoryProvider = ({ children }) => {
     try {
       const response = await axios.get("http://localhost:168/food-category");
       setCategories(response.data);
+      return response.data;
     } catch (error) {
       console.error("Failed to fetch categories", error);
       toast.error("Failed to fetch categories");
@@ -166,6 +167,7 @@ export const FoodCategoryProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCategories();
   }, []);
 

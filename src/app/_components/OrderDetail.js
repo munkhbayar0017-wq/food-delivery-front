@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -40,8 +39,19 @@ export function OrderDetail({ open, setOpen }) {
     try {
       const validOrders = orders.filter((item) => item && item.food);
 
-      const promises = validOrders.map((items) => {
-        return axios.get(`http://localhost:168/food/foodId/${items.food}`);
+      const mergedOrders = validOrders.reduce((acc, item) => {
+        const existingItem = acc.find((i) => i.food === item.food);
+        if (existingItem) {
+          existingItem.quantity += item.quantity;
+        } else {
+          acc.push({ ...item });
+        }
+        return acc;
+      }, []);
+
+      const uniqueFoodIds = [...new Set(mergedOrders.map((item) => item.food))];
+      const promises = uniqueFoodIds.map((foodId) => {
+        return axios.get(`http://localhost:168/food/foodId/${foodId}`);
       });
       const response = await Promise.all(promises);
 
@@ -49,7 +59,7 @@ export function OrderDetail({ open, setOpen }) {
         response.map((res) => {
           return {
             ...res.data,
-            quantity: validOrders.find((item) => item.food === res.data._id)
+            quantity: mergedOrders.find((item) => item.food === res.data._id)
               .quantity,
           };
         })

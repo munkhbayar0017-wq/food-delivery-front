@@ -3,46 +3,22 @@
 import { Footer } from "./layout/Footer";
 import { Header } from "./layout/Header";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Image from "next/image";
-import { toast } from "react-toastify";
 import { FoodDetail } from "./_components/FoodDetail";
+import { useFoodCategory } from "./_provider/FoodCategory";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
-  const [categories, setCategories] = useState([]);
+  const { fetchCategories, fetchFoods, categories } = useFoodCategory();
   const [foodsByCategory, setFoodsByCategory] = useState({});
   const [loading, setLoading] = useState(true);
   const [orderItems, setOrderItems] = useState([]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("http://localhost:168/food-category");
-      setCategories(response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch categories", error);
-      toast.error("Failed to fetch categories");
-    }
-  };
-
-  const fetchFoodsByCategory = async (categoryId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:168/food/${categoryId}`
-      );
-      console.log("response.data", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch foods for category", categoryId, error);
-      return [];
-    }
-  };
 
   // SAIN OILGOOROIII
   const fetchAllFoods = async (categories) => {
     const foodsPromises = categories.map(async (category) => ({
       id: category._id,
-      foods: await fetchFoodsByCategory(category._id),
+      foods: await fetchFoods(category._id),
     }));
 
     const results = await Promise.all(foodsPromises);
@@ -59,6 +35,7 @@ export default function Home() {
   useEffect(() => {
     const loadData = async () => {
       const categoriesData = await fetchCategories();
+      console.log("categoriesData-----", categoriesData);
       if (categoriesData.length > 0) {
         await fetchAllFoods(categoriesData);
       } else {
@@ -76,8 +53,86 @@ export default function Home() {
     return (
       <div className="flex flex-col">
         <Header />
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-lg">Loading...</p>
+        <div className="w-screen bg-[#404040] flex flex-col items-center justify-center">
+          <Skeleton className="w-[1440px] h-[570px]" />
+          <div className="flex flex-col gap-[54px] p-22">
+            <Skeleton className="w-[250px] h-9 rounded-full" />
+            <div className="grid grid-cols-3 gap-13 ">
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-[54px] p-22">
+            <Skeleton className="w-[250px] h-9 rounded-full" />
+            <div className="grid grid-cols-3 gap-13 ">
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-[54px] p-22">
+            <Skeleton className="w-[250px] h-9 rounded-full" />
+            <div className="grid grid-cols-3 gap-13 ">
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <Skeleton className="h-[210px] w-[365px] rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <Footer />
       </div>
@@ -86,12 +141,16 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Header orderItems={orderItems} />
-      <div className="w-screen bg-[#404040] flex flex-col items-center justify-cente">
+      <div className="w-screen bg-[#404040] flex flex-col items-center justify-center">
         <div className="w-[1440px] h-[570px] bg-[url('/Image.png')] bg-cover bg-center"></div>
         <div className="p-22">
           <div className="flex flex-col gap-13 ">
             {categories.map((category) => {
               const foods = foodsByCategory[category._id] || [];
+
+              if (foods.length === 0) {
+                return null;
+              }
 
               return (
                 <div key={category._id} className="flex flex-col w-full gap-13">
@@ -107,7 +166,7 @@ export default function Home() {
                         key={food._id}
                         className="flex flex-col w-[397px] h-[342px] rounded-xl p-4 gap-5 border bg-[#FFFFFF]"
                       >
-                        <div className="relative flex items-end justify-end w-[365px] h-[210px] rounded-xl bg-amber-700 p-15">
+                        <div className="relative flex items-end justify-end w-[365px] h-[210px] rounded-xl p-15">
                           <FoodDetail
                             foodName={food.foodName}
                             price={food.price}
