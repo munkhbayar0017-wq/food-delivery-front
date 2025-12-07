@@ -87,6 +87,7 @@ export default function Foods({
 
   useEffect(() => {
     loadFoods();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId]);
 
   return (

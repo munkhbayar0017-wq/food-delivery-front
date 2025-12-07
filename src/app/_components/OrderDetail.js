@@ -90,6 +90,7 @@ export function OrderDetail({ open, setOpen }) {
     }
     return sum;
   }, 0);
+  const total = totalPrice + 5000;
 
   const handleRemoveFood = (foodId) => {
     setFoodsDetail(foodsDetail.filter((food) => food._id !== foodId));
@@ -173,7 +174,7 @@ export function OrderDetail({ open, setOpen }) {
                         setValue(e.target.value);
                       }}
                     />
-                    {isClick === true && value.length === 0 && (
+                    {isClick && value.length === 0 && (
                       <div className="text-[#EF4444] font-inter text-[12.8px] font-normal leading-[19.2px]">
                         Please complete your address
                       </div>
@@ -224,20 +225,26 @@ export function OrderDetail({ open, setOpen }) {
                   Total
                 </div>
                 <div className="text-[#09090B] text-right font-inter text-lg font-semibold leading-7">
-                  {totalPrice + 5000}₮
+                  {total}₮
                 </div>
               </div>
               <SheetFooter>
-                {value.length !== 0 && <LoginFirst setIsClick={setIsClick} />}
-                {value.length === 0 && (
+                {/* {value.length !== 0 && <LoginFirst setIsClick={setIsClick} />} */}
+                <LoginFirst
+                  setIsClick={setIsClick}
+                  isClick={isClick}
+                  disabled={value.length === 0}
+                  total={total}
+                />
+                {/* {value.length === 0 && (
                   <button
                     className="w-full bg-[#ef444488] h-11 rounded-full text-[#FAFAFA] font-inter text-sm font-medium leading-5 cursor-pointer"
                     type="button"
-                    onClick={() => setIsClick(true)}
+                    onClick={handleCheckout}
                   >
                     Checkout
                   </button>
-                )}
+                )} */}
               </SheetFooter>
             </div>
           </div>
