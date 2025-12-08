@@ -22,11 +22,13 @@ export function LoginFirst({ setIsClick, disabled, isClick, total }) {
 
   const createOrder = async () => {
     const foodQuantity = localStorage.getItem("orders");
-
+    const address = localStorage.getItem("location");
+    console.log("addressss", address);
     try {
       await postOrder({
         totalPrice: total,
         foodOrderItems: JSON.parse(foodQuantity),
+        address: address,
       });
     } catch (error) {
       console.error(error);

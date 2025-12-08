@@ -86,6 +86,7 @@ export function Order() {
       ),
       cell: ({ row }) => {
         const email = row.original.user?.email;
+        console.log("wemeaillll", email);
         return <div className="lowercase">{email}</div>;
       },
     },
@@ -136,7 +137,9 @@ export function Order() {
       accessorKey: "Delivery address",
       header: () => <div className="text-right">Delivery address</div>,
       cell: ({ row }) => {
-        return <div className="text-right font-medium"></div>;
+        return (
+          <div className="text-right font-medium">{row.original.address}</div>
+        );
       },
     },
     //---Delivery state
