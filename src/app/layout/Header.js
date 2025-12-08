@@ -11,13 +11,6 @@ import { useState } from "react";
 export function Header({ orderItems }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const handleClickSignupButton = () => {
-    router.push("/signup");
-  };
-
-  const handleClickLoginButton = () => {
-    router.push("/login");
-  };
 
   return (
     <div className="w-screen bg-[#18181B] flex items-center justify-center">
@@ -39,18 +32,6 @@ export function Header({ orderItems }) {
           <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200">
             <UserIcon />
           </div>
-          {/* <button
-            className="w-[75px] h-9 bg-[#F4F4F5] text-[#18181B] rounded-full font-inter text-[14px] font-medium leading-5 cursor-pointer hover:bg-gray-300 hover:text-black transition-colors duration-200"
-            onClick={handleClickSignupButton}
-          >
-            Sign up
-          </button>
-          <button
-            className="w-[65px] h-9 bg-[#EF4444] text-[#FAFAFA] rounded-full font-inter text-[14px] font-medium leading-5 cursor-pointer hover:bg-red-600 transition-colors duration-200"
-            onClick={handleClickLoginButton}
-          >
-            Log in
-          </button> */}
         </div>
       </div>
     </div>

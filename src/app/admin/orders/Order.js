@@ -30,6 +30,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Calendar29 } from "./Calendar";
 import { useFoodCategory } from "@/app/_provider/FoodCategory";
 
@@ -40,13 +50,12 @@ export function Order() {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const { orders, fetchOrders } = useFoodCategory();
-
+  const [selectedOption, setSelectedOption] = useState("Pending");
+  console.log("selectedOption----", selectedOption);
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  console.log("this is order", orders);
 
   const columns = [
     {
@@ -86,7 +95,6 @@ export function Order() {
       ),
       cell: ({ row }) => {
         const email = row.original.user?.email;
-        console.log("wemeaillll", email);
         return <div className="lowercase">{email}</div>;
       },
     },
@@ -147,37 +155,69 @@ export function Order() {
       accessorKey: "status",
       header: "Delivery state",
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("status")}</div>
+        <Select
+          className="w-40"
+          value={selectedOption}
+          onValueChange={(value) => {
+            setSelectedOption(value);
+          }}
+        >
+          <SelectTrigger className="w-[110px] text-[#09090B] text-[12px] font-semibold leading-4 rounded-full border border-[#EF4444]">
+            <SelectValue placeholder="Select a status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem
+                value="DELIVERED"
+                className="text-[#09090B] text-[12px] font-semibold leading-4"
+              >
+                Delivered
+              </SelectItem>
+              <SelectItem
+                value="PENDING"
+                className="text-[#09090B] text-[12px] font-semibold leading-4"
+              >
+                Pending
+              </SelectItem>
+              <SelectItem
+                value="CANCELED"
+                className="text-[#09090B] text-[12px] font-semibold leading-4"
+              >
+                Cancelled
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       ),
     },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const payment = row.original;
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(payment.id)}
-              >
-                Copy payment ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View customer</DropdownMenuItem>
-              <DropdownMenuItem>View payment details</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
+    // {
+    //   id: "actions",
+    //   enableHiding: false,
+    //   cell: ({ row }) => {
+    //     const payment = row.original;
+    //     return (
+    //       <DropdownMenu>
+    //         <DropdownMenuTrigger asChild>
+    //           <Button variant="ghost" className="h-8 w-8 p-0">
+    //             <span className="sr-only">Open menu</span>
+    //             <MoreHorizontal />
+    //           </Button>
+    //         </DropdownMenuTrigger>
+    //         <DropdownMenuContent align="end">
+    //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+    //           <DropdownMenuItem
+    //             onClick={() => navigator.clipboard.writeText(payment.id)}
+    //           >
+    //             Copy payment ID
+    //           </DropdownMenuItem>
+    //           <DropdownMenuSeparator />
+    //           <DropdownMenuItem>View customer</DropdownMenuItem>
+    //           <DropdownMenuItem>View payment details</DropdownMenuItem>
+    //         </DropdownMenuContent>
+    //       </DropdownMenu>
+    //     );
+    //   },
+    // },
   ];
 
   const table = useReactTable({
@@ -200,7 +240,7 @@ export function Order() {
   });
 
   return (
-    <div className="flex w-screen h-screen gap-6 items-center justify-center">
+    <div className="flex h-screen gap-6 items-center justify-center">
       <div className="w-[1170px] bg-[#FFFFFF] rounded-t-md">
         <div className="flex items-center py-4 border-t border-r border-l rounded-t-md justify-between p-4">
           <div className="flex flex-col">

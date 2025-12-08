@@ -177,7 +177,6 @@ export const FoodCategoryProvider = ({ children }) => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const response = await axios.get("http://localhost:168/order", {
         headers: { Authorization: `Bearer ${token}` },
       });

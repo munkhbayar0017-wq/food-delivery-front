@@ -20,7 +20,11 @@ export function OrderDetail({ open, setOpen }) {
   const [orderItems, setOrderItems] = useState([]);
   const [active, setActive] = useState("Cart");
   const [foodsDetail, setFoodsDetail] = useState([]);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(
+    typeof window !== "undefined"
+      ? window?.localStorage?.getItem("location")
+      : ""
+  );
   const [isClick, setIsClick] = useState(false);
 
   const handleClickOrderButton = () => {
@@ -233,7 +237,7 @@ export function OrderDetail({ open, setOpen }) {
                 <LoginFirst
                   setIsClick={setIsClick}
                   isClick={isClick}
-                  disabled={value.length === 0}
+                  disabled={value?.length === 0}
                   total={total}
                 />
                 {/* {value.length === 0 && (
