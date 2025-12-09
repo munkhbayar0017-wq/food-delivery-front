@@ -22,7 +22,7 @@ export const FoodCategoryProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [foods, setFoods] = useState([]);
   const [orders, setOrders] = useState([]);
-
+  const [ordersByIds, setOrdersByIds] = useState();
   const UPLOAD_PRESET = "food-delivery";
   const CLOUD_NAME = "dyntg7qqu";
 
@@ -36,11 +36,6 @@ export const FoodCategoryProvider = ({ children }) => {
       toast.error("Failed to fetch categories");
     }
   };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCategories();
-  }, []);
 
   const postCategories = async (categoryName) => {
     try {
@@ -167,11 +162,6 @@ export const FoodCategoryProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCategories();
-  }, []);
-
   // Orders-------
 
   const fetchOrders = async () => {
@@ -186,6 +176,22 @@ export const FoodCategoryProvider = ({ children }) => {
       console.error("Failed to fetch order", error);
       toast.error("Failed to fetch order");
       return [];
+    }
+  };
+
+  const fetchOrderById = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(`http://localhost:168/order/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOrdersByIds(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch order by id", error);
+      toast.error("Failed to fetch order");
+      return null;
     }
   };
 
@@ -212,6 +218,31 @@ export const FoodCategoryProvider = ({ children }) => {
     fetchCategories();
   }, []);
 
+  const updateOrderStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.put(
+        "http://localhost:168/order",
+        {
+          id: id,
+          status: status,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update order status", error);
+      toast.error("Failed to update order status");
+      throw error;
+    }
+  };
+
   return (
     <FoodCategoryContext.Provider
       value={{
@@ -228,6 +259,9 @@ export const FoodCategoryProvider = ({ children }) => {
         orders,
         postOrder,
         fetchOrders,
+        updateOrderStatus,
+        ordersByIds,
+        fetchOrderById,
       }}
     >
       {children}

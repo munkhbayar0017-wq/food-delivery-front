@@ -9,19 +9,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Table,
   TableBody,
@@ -35,27 +27,42 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 
 import { Calendar29 } from "./Calendar";
 import { useFoodCategory } from "@/app/_provider/FoodCategory";
+import { ChangeDeliveryState } from "@/app/_components/ChangeDeliveryState";
+import Image from "next/image";
 
-// Main component
 export function Order() {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const { orders, fetchOrders } = useFoodCategory();
-  const [selectedOption, setSelectedOption] = useState("Pending");
-  console.log("selectedOption----", selectedOption);
+  const { orders, fetchOrders, updateOrderStatus } = useFoodCategory();
+  const [selectedIds, setSelectedIds] = useState([]);
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const ids = selectedRows.map((row) => row.original._id || row.original.id);
+    setSelectedIds(ids);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowSelection]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      await fetchOrders();
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+    }
+  };
 
   const columns = [
     {
@@ -73,7 +80,9 @@ export function Order() {
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={(value) => {
+            row.toggleSelected(!!value), console.log("here");
+          }}
           aria-label="Select row"
         />
       ),
@@ -102,27 +111,62 @@ export function Order() {
     //---Food
     {
       accessorKey: "foodOrderItems",
-      header: () => <div className="text-right">Food</div>,
+      header: () => <div className="text-left pl-7">Food</div>,
       cell: ({ row }) => {
-        // console.log("lslslslslsl", row.original.foodOrderItems.quantity);
+        console.log("food222", row.original.foodOrderItems);
         return (
-          <div className="text-right font-medium">
-            {row.original.foodOrderItems.reduce(
-              (sum, i) => sum + i.quantity,
-              0
-            )}{" "}
-            Foods
-          </div>
+          <Select>
+            <SelectTrigger className="border-none shadow-none w-30">
+              <SelectValue />
+              <div className="text-left font-medium">
+                {row.original.foodOrderItems.reduce(
+                  (sum, i) => sum + i.quantity,
+                  0
+                )}{" "}
+                Foods
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <div className=" flex flex-col gap-3 w-[263px] p-3">
+                  {row.original.foodOrderItems.map((item) => (
+                    <div
+                      key={item._id}
+                      className="flex items-center justify-center h-8 gap-2.5"
+                    >
+                      <div className="w-8 h-8 overflow-hidden rounded-md">
+                        <Image
+                          src={item.food.image}
+                          alt={item.food.foodName}
+                          width={32}
+                          height={32}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                      <div className="w-full flex justify-between">
+                        <div className="text-[#09090B] font-inter text-[12px] font-normal leading-4">
+                          {item.food.foodName}
+                        </div>
+                        <div class="text-[#09090B] font-inter text-[12px] font-normal leading-4">
+                          x {item.quantity}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         );
       },
     },
     //---Date
     {
       accessorKey: "Date",
-      header: () => <div className="text-right">Date</div>,
+      header: () => <div className="text-left">Date</div>,
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">
+          <div className="text-left font-medium">
             {row.original.updatedAt.split("T")[0]}
           </div>
         );
@@ -131,10 +175,10 @@ export function Order() {
     //---Total
     {
       accessorKey: "totalPrice",
-      header: () => <div className="text-right">Total</div>,
+      header: () => <div className="text-left">Total</div>,
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">
+          <div className="text-left font-medium">
             {row.original.totalPrice}₮
           </div>
         );
@@ -143,10 +187,10 @@ export function Order() {
     //---Delivery address
     {
       accessorKey: "Delivery address",
-      header: () => <div className="text-right">Delivery address</div>,
+      header: () => <div className="text-left">Delivery address</div>,
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">{row.original.address}</div>
+          <div className="text-left font-medium">{row.original.address}</div>
         );
       },
     },
@@ -154,70 +198,65 @@ export function Order() {
     {
       accessorKey: "status",
       header: "Delivery state",
-      cell: ({ row }) => (
-        <Select
-          className="w-40"
-          value={selectedOption}
-          onValueChange={(value) => {
-            setSelectedOption(value);
-          }}
-        >
-          <SelectTrigger className="w-[110px] text-[#09090B] text-[12px] font-semibold leading-4 rounded-full border border-[#EF4444]">
-            <SelectValue placeholder="Select a status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem
-                value="DELIVERED"
-                className="text-[#09090B] text-[12px] font-semibold leading-4"
-              >
-                Delivered
-              </SelectItem>
-              <SelectItem
-                value="PENDING"
-                className="text-[#09090B] text-[12px] font-semibold leading-4"
-              >
-                Pending
-              </SelectItem>
-              <SelectItem
-                value="CANCELED"
-                className="text-[#09090B] text-[12px] font-semibold leading-4"
-              >
-                Cancelled
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      ),
+      cell: ({ row }) => {
+        const currentStatus = row.original.status || "PENDING";
+
+        const getBorderColor = (status) => {
+          switch (status) {
+            case "DELIVERED":
+              return "border-green-500";
+            case "PENDING":
+              return "border-red-500";
+            case "CANCELED":
+              return "border-gray-400";
+            default:
+              return "border-gray-300";
+          }
+        };
+        return (
+          <Select
+            className="w-40"
+            value={currentStatus}
+            onValueChange={(newStatus) => {
+              handleStatusChange(
+                row.original._id || row.original.id,
+                newStatus
+              );
+            }}
+          >
+            <SelectTrigger
+              className={`w-[110px] text-[#09090B] text-[12px] font-semibold leading-4 rounded-full border ${getBorderColor(
+                currentStatus
+              )}`}
+            >
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem
+                  value="DELIVERED"
+                  className="text-[#09090B] text-[12px] font-semibold leading-4"
+                >
+                  Delivered
+                </SelectItem>
+                <SelectItem
+                  value="PENDING"
+                  className="text-[#09090B] text-[12px] font-semibold leading-4"
+                >
+                  Pending
+                </SelectItem>
+                <SelectItem
+                  value="CANCELED"
+                  className="text-[#09090B] text-[12px] font-semibold leading-4"
+                >
+                  Cancelled
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        );
+      },
     },
-    // {
-    //   id: "actions",
-    //   enableHiding: false,
-    //   cell: ({ row }) => {
-    //     const payment = row.original;
-    //     return (
-    //       <DropdownMenu>
-    //         <DropdownMenuTrigger asChild>
-    //           <Button variant="ghost" className="h-8 w-8 p-0">
-    //             <span className="sr-only">Open menu</span>
-    //             <MoreHorizontal />
-    //           </Button>
-    //         </DropdownMenuTrigger>
-    //         <DropdownMenuContent align="end">
-    //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    //           <DropdownMenuItem
-    //             onClick={() => navigator.clipboard.writeText(payment.id)}
-    //           >
-    //             Copy payment ID
-    //           </DropdownMenuItem>
-    //           <DropdownMenuSeparator />
-    //           <DropdownMenuItem>View customer</DropdownMenuItem>
-    //           <DropdownMenuItem>View payment details</DropdownMenuItem>
-    //         </DropdownMenuContent>
-    //       </DropdownMenu>
-    //     );
-    //   },
-    // },
   ];
 
   const table = useReactTable({
@@ -241,7 +280,7 @@ export function Order() {
 
   return (
     <div className="flex h-screen gap-6 items-center justify-center">
-      <div className="w-[1170px] bg-[#FFFFFF] rounded-t-md">
+      <div className="w-[1170px] bg-[#FFFFFF] rounded-md">
         <div className="flex items-center py-4 border-t border-r border-l rounded-t-md justify-between p-4">
           <div className="flex flex-col">
             <div className="font-bold text-xl leading-7 tracking-[-0.5px]">
@@ -253,34 +292,11 @@ export function Order() {
           </div>
           <div className="flex gap-3">
             <Calendar29 />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto">
-                  Change delivery state <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ChangeDeliveryState selectedIds={selectedIds} />
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-b-md border">
+        <div className="overflow-hidden border">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -301,21 +317,23 @@ export function Order() {
 
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell
@@ -330,9 +348,9 @@ export function Order() {
           </Table>
         </div>
 
-        <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex items-center justify-end space-x-2 p-4 border rounded-b-md">
           <div className="text-muted-foreground flex-1 text-sm">
-            {table.getFilteredSelectedRowModel().rows.length} of
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
           <div className="space-x-2">

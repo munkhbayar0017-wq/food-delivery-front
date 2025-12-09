@@ -25,7 +25,7 @@ function formatDate(date) {
 
 export function Calendar29() {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("In 2 days");
+  const [value, setValue] = React.useState("Today");
 
   // parseDate ашиглан анхны огноог state-д хадгалах
   const initialDate = parseDate(value) || undefined;

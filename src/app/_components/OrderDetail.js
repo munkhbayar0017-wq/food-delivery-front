@@ -15,17 +15,47 @@ import axios from "axios";
 import FoodsDetailMap from "./FoodsDetailMap";
 import LogoIcon from "../Icons/LogoIcon";
 import { LoginFirst } from "./LoginFirst";
+import { useFoodCategory } from "../_provider/FoodCategory";
+import Image from "next/image";
+import FoodIcon from "../Icons/FoodIcon";
+import TimerIcon from "../Icons/TimerIcon";
+import MapIcon from "../Icons/MapIcon";
 
 export function OrderDetail({ open, setOpen }) {
   const [orderItems, setOrderItems] = useState([]);
   const [active, setActive] = useState("Cart");
   const [foodsDetail, setFoodsDetail] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const { orders, fetchOrders, fetchOrderById } = useFoodCategory();
+
+  useEffect(() => {
+    if (open) {
+      fetchOrders();
+    }
+  }, [open, fetchOrders]);
+
   const [value, setValue] = useState(
     typeof window !== "undefined"
       ? window?.localStorage?.getItem("location")
       : ""
   );
   const [isClick, setIsClick] = useState(false);
+  console.log("selectedOrder---", selectedOrder);
+
+  const handleOrderClick = async (orderId) => {
+    try {
+      const order = await fetchOrderById(orderId);
+      setSelectedOrder(order);
+      setActive("Order");
+    } catch (err) {
+      toast.error("Failed to load order details");
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchOrderById("693791aa884ffa38e65bde96");
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const handleClickOrderButton = () => {
     setActive("Order");
@@ -34,7 +64,6 @@ export function OrderDetail({ open, setOpen }) {
     setActive("Cart");
   };
   const fetchFoods = async (orders) => {
-    console.log("this is order", orders);
     if (!orders || orders.length === 0) {
       setFoodsDetail([]);
       return;
@@ -74,11 +103,9 @@ export function OrderDetail({ open, setOpen }) {
   };
   useEffect(() => {
     if (open) {
-      console.log("hello this is running");
       const localStorageOrders = window.localStorage.getItem("orders");
       if (localStorageOrders) {
         const parsedArray = JSON.parse(localStorageOrders);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setOrderItems(parsedArray);
         if (parsedArray && parsedArray.length > 0) {
           fetchFoods(parsedArray);
@@ -99,6 +126,7 @@ export function OrderDetail({ open, setOpen }) {
   const handleRemoveFood = (foodId) => {
     setFoodsDetail(foodsDetail.filter((food) => food._id !== foodId));
   };
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -237,39 +265,86 @@ export function OrderDetail({ open, setOpen }) {
                 <LoginFirst
                   setIsClick={setIsClick}
                   isClick={isClick}
-                  disabled={value?.length === 0}
+                  disabled={
+                    !value || value.length === 0 || foodsDetail.length === 0
+                  }
                   total={total}
+                  setFoodsDetail={setFoodsDetail}
                 />
-                {/* {value.length === 0 && (
-                  <button
-                    className="w-full bg-[#ef444488] h-11 rounded-full text-[#FAFAFA] font-inter text-sm font-medium leading-5 cursor-pointer"
-                    type="button"
-                    onClick={handleCheckout}
-                  >
-                    Checkout
-                  </button>
-                )} */}
               </SheetFooter>
             </div>
           </div>
         )}
         {active === "Order" && (
-          <div className="h-full flex flex-col gap-5 p-4 bg-white rounded-[20px] transition-colors duration-200">
+          <div className="h-[873px] flex flex-col gap-5 p-4 bg-white rounded-[20px] transition-colors duration-200">
             <SheetTitle className="text-[#71717A] font-inter text-[20px] font-semibold leading-7 tracking-[-0.5px]">
               Order history
             </SheetTitle>
-            <div className="h-[328px] gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
-              <div className="w-full h-[182px] bg-[#F4F4F5] rounded-xl flex flex-col items-center justify-center px-12 py-8">
-                <LogoIcon />
-                <div className="text-[#09090B] text-center font-inter text-base font-bold leading-7">
-                  No Orders Yet?
-                </div>
-                <div className="text-[#71717A] text-center font-inter text-xs font-normal leading-4">
-                  🍕 &quot;You haven&apos;t placed any orders yet. Start
-                  exploring our menu and satisfy your cravings!&quot;
+            {orders.length === 0 ? (
+              <div className="h-[328px] gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
+                <div className="w-full h-[182px] bg-[#F4F4F5] rounded-xl flex flex-col items-center justify-center px-12 py-8">
+                  <LogoIcon />
+                  <div className="text-[#09090B] text-center font-inter text-base font-bold leading-7">
+                    No Orders Yet?
+                  </div>
+                  <div className="text-[#71717A] text-center font-inter text-xs font-normal leading-4">
+                    🍕 &quot;You haven&apos;t placed any orders yet. Start
+                    exploring our menu and satisfy your cravings!&quot;
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
+                {orders.map((item) => {
+                  return (
+                    <div key={item._id} className="flex flex-col gap-3 p-3">
+                      <div className="flex justify-between items-center">
+                        <div className="text-[#09090B] font-inter text-[16px] font-bold leading-7">
+                          {item.totalPrice}₮
+                        </div>
+                        <div className="flex items-center justify-center text-[#09090B] font-inter text-[12px] font-semibold leading-4 border rounded-full w-[68px] h-7">
+                          {item.status}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {item.foodOrderItems.map((item) => {
+                          return (
+                            <div key={item._id}>
+                              <div className="flex justify-between items-center">
+                                <div className="flex gap-2">
+                                  <FoodIcon />
+                                  <div className="text-[#71717A] font-inter text-[12px] font-normal leading-4">
+                                    {item.food.foodName}
+                                  </div>
+                                </div>
+
+                                <div className="text-[#71717A] font-inter text-[12px] font-normal leading-4">
+                                  x {item.quantity}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <TimerIcon />
+                        <div className="text-[#71717A] font-inter text-[12px] font-normal leading-4">
+                          {item.updatedAt.split("T")[0]}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <MapIcon />
+                        <div className="text-[#71717A] font-inter text-[12px] font-normal leading-4">
+                          {item.address}
+                        </div>
+                      </div>
+                      <div className="border-t w-full h-px"></div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </SheetContent>

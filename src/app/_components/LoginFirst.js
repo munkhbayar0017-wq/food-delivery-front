@@ -8,7 +8,13 @@ import {
 import { useRouter } from "next/navigation";
 import { useFoodCategory } from "../_provider/FoodCategory";
 
-export function LoginFirst({ setIsClick, disabled, isClick, total }) {
+export function LoginFirst({
+  setIsClick,
+  disabled,
+  isClick,
+  total,
+  setFoodsDetail,
+}) {
   const router = useRouter();
   const { postOrder } = useFoodCategory();
   const token = localStorage.getItem("token");
@@ -30,12 +36,17 @@ export function LoginFirst({ setIsClick, disabled, isClick, total }) {
         foodOrderItems: JSON.parse(foodQuantity),
         address: address,
       });
+
+      setFoodsDetail([]);
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleClickCheckoutButton = () => {
+    if (disabled) {
+      return;
+    }
     if (token) {
       createOrder();
     } else {
@@ -46,13 +57,20 @@ export function LoginFirst({ setIsClick, disabled, isClick, total }) {
   return (
     <>
       <Button
-        className="w-full bg-[#EF4444] h-11 rounded-full text-[#FAFAFA] font-inter text-sm font-medium leading-5 cursor-pointer hover:bg-red-600 transition-colors duration-200"
+        className={`w-full h-11 rounded-full font-inter text-sm font-medium leading-5 transition-colors duration-200
+    ${
+      disabled
+        ? "bg-[#ef444488] text-white cursor-not-allowed opacity-50"
+        : "bg-[#EF4444] text-white hover:bg-red-600"
+    }
+  `}
         type="button"
         disabled={disabled}
         onClick={handleClickCheckoutButton}
       >
         Checkout
       </Button>
+
       <Dialog open={isClick} onOpenChange={setIsClick}>
         <DialogContent className="w-[425px] flex flex-col items-center justify-center gap-12">
           <DialogTitle className="text-[#09090B] font-inter text-[24px] font-semibold leading-8 tracking-[-0.6px]">
