@@ -1,16 +1,62 @@
 "use client";
 
 import LogoIcon from "../Icons/LogoIcon";
-import { useRouter } from "next/navigation";
-import CartIcon from "../Icons/CartIcon";
 import UserIcon from "../Icons/UserIcon";
 import { AddDeliveryAddress } from "../_components/AddDeliveryAddress";
 import { OrderDetail } from "../_components/OrderDetail";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useFoodCategory } from "../_provider/FoodCategory";
+import { useRouter } from "next/navigation";
 
-export function Header({ orderItems }) {
+export function Header() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
+  // const [foodOrder, setFoodOrder] = useState([]);
+  const { fetchOrderById } = useFoodCategory();
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const emailLS = localStorage.getItem("email");
+    const tokenLS = localStorage.getItem("token");
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setEmail(emailLS || "");
+    setToken(tokenLS || "");
+  }, []);
+
+  const logOutUser = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    localStorage.removeItem("location");
+    localStorage.removeItem("orders");
+    localStorage.removeItem("role");
+    window.location.reload();
+  };
+
+  const logInUser = () => {
+    router.push("/login");
+  };
+
+  const signUpUser = () => {
+    router.push("/signup");
+  };
+
+  // const handleGetOrders = async () => {
+  //   try {
+  //     const order = await fetchOrderById();
+  //     setFoodOrder(order);
+  //     console.log("order", order);
+  //   } catch (err) {
+  //     toast.error("Failed to load order details");
+  //   }
+  // };
 
   return (
     <div className="w-screen bg-[#18181B] flex items-center justify-center">
@@ -29,9 +75,44 @@ export function Header({ orderItems }) {
         <div className="flex gap-3">
           <AddDeliveryAddress />
           <OrderDetail setOpen={setOpen} open={open} />
-          <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200">
-            <UserIcon />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <div
+                // onClick={handleGetOrders}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200"
+              >
+                <UserIcon />
+              </div>
+            </PopoverTrigger>
+            {token ? (
+              <PopoverContent className="w-[188px] h-[104px] flex flex-col items-center justify-center gap-2">
+                <div className="flex items-center truncate text-[#09090B] text-center font-inter text-[16px] font-semibold leading-7 tracking-[-0.5px] w-[156px]">
+                  {email}
+                </div>
+                <div
+                  onClick={logOutUser}
+                  className="flex items-center justify-center bg-[#F4F4F5] rounded-full w-20 h-9 text-[#18181B] font-inter text-[14px] font-medium leading-5  hover:bg-gray-300 hover:text-black transition-colors duration-200 cursor-pointer"
+                >
+                  Sign out
+                </div>
+              </PopoverContent>
+            ) : (
+              <PopoverContent className="w-[100px] h-[104px] flex flex-col items-center justify-center gap-2">
+                <div
+                  onClick={logInUser}
+                  className="flex items-center justify-center bg-[#F4F4F5] rounded-full w-20 h-9 text-[#18181B] font-inter text-[14px] font-medium leading-5  hover:bg-gray-300 hover:text-black transition-colors duration-200 cursor-pointer"
+                >
+                  Log in
+                </div>
+                <div
+                  onClick={signUpUser}
+                  className="flex items-center justify-center bg-[#F4F4F5] rounded-full w-20 h-9 text-[#18181B] font-inter text-[14px] font-medium leading-5  hover:bg-gray-300 hover:text-black transition-colors duration-200 cursor-pointer"
+                >
+                  Sign up
+                </div>
+              </PopoverContent>
+            )}
+          </Popover>
         </div>
       </div>
     </div>

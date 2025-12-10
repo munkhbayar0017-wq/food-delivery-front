@@ -81,7 +81,7 @@ export function Order() {
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => {
-            row.toggleSelected(!!value), console.log("here");
+            row.toggleSelected(!!value);
           }}
           aria-label="Select row"
         />
@@ -113,7 +113,7 @@ export function Order() {
       accessorKey: "foodOrderItems",
       header: () => <div className="text-left pl-7">Food</div>,
       cell: ({ row }) => {
-        console.log("food222", row.original.foodOrderItems);
+        // console.log("food222", row.original.foodOrderItems);
         return (
           <Select>
             <SelectTrigger className="border-none shadow-none w-30">
@@ -147,7 +147,7 @@ export function Order() {
                         <div className="text-[#09090B] font-inter text-[12px] font-normal leading-4">
                           {item.food.foodName}
                         </div>
-                        <div class="text-[#09090B] font-inter text-[12px] font-normal leading-4">
+                        <div className="text-[#09090B] font-inter text-[12px] font-normal leading-4">
                           x {item.quantity}
                         </div>
                       </div>
@@ -207,7 +207,7 @@ export function Order() {
               return "border-green-500";
             case "PENDING":
               return "border-red-500";
-            case "CANCELED":
+            case "CANCELLED":
               return "border-gray-400";
             default:
               return "border-gray-300";
@@ -246,7 +246,7 @@ export function Order() {
                   Pending
                 </SelectItem>
                 <SelectItem
-                  value="CANCELED"
+                  value="CANCELLED"
                   className="text-[#09090B] text-[12px] font-semibold leading-4"
                 >
                   Cancelled

@@ -7,20 +7,25 @@ import { useState } from "react";
 import { Order } from "./orders/Order";
 import { cn } from "@/lib/utils";
 import { Categories } from "./foodmenu/Category";
+import { useRouter } from "next/navigation";
 
 export default function Administrator() {
   const [orders, setOrders] = useState(false);
+  const router = useRouter();
   const handleClickOrdersButton = () => {
     setOrders(true);
   };
   const handleClickFoodMenuButton = () => {
     setOrders(false);
   };
+  const moveToHomePage = () => {
+    router.push("/");
+  };
   return (
     <div className="flex w-screen gap-6 items-start justify-start bg-[#F4F4F5]">
       {/* sticky */}
       <div className="w-[205px] h-screen sticky top-0 border flex flex-col items-center gap-10 px-5 py-9 bg-[#FFFFFF]">
-        <div className="flex gap-2">
+        <div className="flex gap-2 cursor-pointer" onClick={moveToHomePage}>
           <LogoIcon />
           <div>
             <p className="text-[#09090B] font-inter text-[18px] font-semibold leading-7">

@@ -20,42 +20,45 @@ import Image from "next/image";
 import FoodIcon from "../Icons/FoodIcon";
 import TimerIcon from "../Icons/TimerIcon";
 import MapIcon from "../Icons/MapIcon";
+import { toast } from "react-toastify";
 
 export function OrderDetail({ open, setOpen }) {
   const [orderItems, setOrderItems] = useState([]);
   const [active, setActive] = useState("Cart");
   const [foodsDetail, setFoodsDetail] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const { orders, fetchOrders, fetchOrderById } = useFoodCategory();
+  const [foodOrder, setFoodOrder] = useState([]);
+  const { fetchOrderById } = useFoodCategory();
+  // console.log("foodorder", foodOrder);
 
   useEffect(() => {
     if (open) {
-      fetchOrders();
+      handleGetOrders();
     }
-  }, [open, fetchOrders]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const [value, setValue] = useState(
     typeof window !== "undefined"
-      ? window?.localStorage?.getItem("location")
+      ? window?.localStorage?.getItem("location") || ""
       : ""
   );
   const [isClick, setIsClick] = useState(false);
-  console.log("selectedOrder---", selectedOrder);
 
-  const handleOrderClick = async (orderId) => {
+  const handleGetOrders = async () => {
     try {
-      const order = await fetchOrderById(orderId);
-      setSelectedOrder(order);
-      setActive("Order");
+      const order = await fetchOrderById();
+      setFoodOrder(order);
+      // console.log("order", order);
+      if (foodOrder.length === 0) {
+        setActive("Cart");
+      } else {
+        setActive("Order");
+      }
     } catch (err) {
-      toast.error("Failed to load order details");
+      console.log("Failed to load order details");
+      // toast.error("Failed to load order details");
     }
   };
-
-  // useEffect(() => {
-  //   fetchOrderById("693791aa884ffa38e65bde96");
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
 
   const handleClickOrderButton = () => {
     setActive("Order");
@@ -130,8 +133,13 @@ export function OrderDetail({ open, setOpen }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#FFFFFF] cursor-pointer hover:bg-gray-300 hover:text-black transition-colors duration-200">
+        <div className="relative w-9 h-9 rounded-full flex items-center justify-center bg-[#FFFFFF] cursor-pointer hover:bg-gray-300 hover:text-black transition-colors duration-200">
           <CartIcon />
+          {foodsDetail.length !== 0 && (
+            <div className="left-6 bottom-6 rounded-full flex items-center justify-center w-5 h-5 absolute bg-[#EF4444] text-[#FAFAFA] font-inter text-[10px] font-medium leading-4">
+              {foodsDetail.length}
+            </div>
+          )}
         </div>
       </SheetTrigger>
       <SheetContent className="bg-[#404040] w-[535px] rounded-l-2xl p-8">
@@ -173,7 +181,7 @@ export function OrderDetail({ open, setOpen }) {
               </SheetTitle>
               {foodsDetail.length !== 0 && (
                 <div className="flex flex-col justify-between h-full">
-                  <div className="h-fit overflow-y-auto">
+                  <div className="h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
                     <div className="h-full flex flex-col gap-5">
                       {foodsDetail.map((food) => (
                         <FoodsDetailMap
@@ -204,6 +212,7 @@ export function OrderDetail({ open, setOpen }) {
                       className="h-20"
                       onChange={(e) => {
                         setValue(e.target.value);
+                        window.localStorage.setItem("location", e.target.value);
                       }}
                     />
                     {isClick && value.length === 0 && (
@@ -269,6 +278,7 @@ export function OrderDetail({ open, setOpen }) {
                     !value || value.length === 0 || foodsDetail.length === 0
                   }
                   total={total}
+                  location={value}
                   setFoodsDetail={setFoodsDetail}
                 />
               </SheetFooter>
@@ -280,7 +290,7 @@ export function OrderDetail({ open, setOpen }) {
             <SheetTitle className="text-[#71717A] font-inter text-[20px] font-semibold leading-7 tracking-[-0.5px]">
               Order history
             </SheetTitle>
-            {orders.length === 0 ? (
+            {!foodOrder && (
               <div className="h-[328px] gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
                 <div className="w-full h-[182px] bg-[#F4F4F5] rounded-xl flex flex-col items-center justify-center px-12 py-8">
                   <LogoIcon />
@@ -293,16 +303,44 @@ export function OrderDetail({ open, setOpen }) {
                   </div>
                 </div>
               </div>
-            ) : (
+            )}
+
+            {foodOrder?.length === 0 && (
+              <div className="h-[328px] gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
+                <div className="w-full h-[182px] bg-[#F4F4F5] rounded-xl flex flex-col items-center justify-center px-12 py-8">
+                  <LogoIcon />
+                  <div className="text-[#09090B] text-center font-inter text-base font-bold leading-7">
+                    No Orders Yet?
+                  </div>
+                  <div className="text-[#71717A] text-center font-inter text-xs font-normal leading-4">
+                    🍕 &quot;You haven&apos;t placed any orders yet. Start
+                    exploring our menu and satisfy your cravings!&quot;
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {foodOrder?.length !== 0 && (
               <div className="gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-200">
-                {orders.map((item) => {
+                {foodOrder?.map((item) => {
                   return (
                     <div key={item._id} className="flex flex-col gap-3 p-3">
                       <div className="flex justify-between items-center">
                         <div className="text-[#09090B] font-inter text-[16px] font-bold leading-7">
                           {item.totalPrice}₮
                         </div>
-                        <div className="flex items-center justify-center text-[#09090B] font-inter text-[12px] font-semibold leading-4 border rounded-full w-[68px] h-7">
+                        <div
+                          className={`flex items-center justify-center text-[#09090B] font-inter text-[10px] font-semibold leading-4 rounded-full w-[68px] h-7 border 
+      ${
+        item.status === "PENDING"
+          ? "border-red-500"
+          : item.status === "CANCELLED"
+          ? "border-gray-400"
+          : item.status === "DELIVERED"
+          ? "border-green-500"
+          : ""
+      }`}
+                        >
                           {item.status}
                         </div>
                       </div>

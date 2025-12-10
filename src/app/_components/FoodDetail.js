@@ -38,7 +38,7 @@ export function FoodDetail({
   };
 
   const handleClickAddToCartButton = () => {
-    console.log({ food: foodId, quantity: count });
+    // console.log({ food: foodId, quantity: count });
 
     setOrderItems((prev) => [...prev, { food: foodId, quantity: count }]);
     localStorage.setItem(

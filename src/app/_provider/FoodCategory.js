@@ -22,7 +22,7 @@ export const FoodCategoryProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [foods, setFoods] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [ordersByIds, setOrdersByIds] = useState();
+  // const [ordersByIds, setOrdersByIds] = useState();
   const UPLOAD_PRESET = "food-delivery";
   const CLOUD_NAME = "dyntg7qqu";
 
@@ -80,7 +80,7 @@ export const FoodCategoryProvider = ({ children }) => {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch food", error);
-      toast.error("Failed to fetch foods");
+      // toast.error("Failed to fetch foods");
       return [];
     }
   };
@@ -179,18 +179,19 @@ export const FoodCategoryProvider = ({ children }) => {
     }
   };
 
-  const fetchOrderById = async (id) => {
+  const fetchOrderById = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(`http://localhost:168/order/${id}`, {
+      const response = await axios.get("http://localhost:168/order/userId", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setOrdersByIds(response.data);
+      // setOrdersByIds(response.data);
+      // console.log("response", response);
       return response.data;
     } catch (error) {
       console.error("Failed to fetch order by id", error);
-      toast.error("Failed to fetch order");
+      // toast.error("Failed to fetch order");
       return null;
     }
   };
@@ -260,7 +261,7 @@ export const FoodCategoryProvider = ({ children }) => {
         postOrder,
         fetchOrders,
         updateOrderStatus,
-        ordersByIds,
+        // ordersByIds,
         fetchOrderById,
       }}
     >

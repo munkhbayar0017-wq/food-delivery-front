@@ -39,13 +39,23 @@ export default function LoginPage({ className }) {
             password: values.password,
           }
         );
-        console.log("response", response.data.token);
+
         localStorage.setItem("token", response.data.token);
-        console.log("Push to homepage success");
+        localStorage.setItem("role", response.data.user.role);
+        localStorage.setItem("email", response.data.user.email);
+
+        const role = response.data.user.role;
+
+        const isAdmin = role === "ADMIN";
+        // console.log("Push to homepage success");
         toast.success("Login successful!");
-        router.push("/");
+        if (!isAdmin) {
+          router.push("/");
+        } else {
+          router.push("/admin");
+        }
       } catch (error) {
-        console.log(error.response?.data);
+        // console.log(error.response?.data);
         toast.error(error.response?.data || "User not found");
         setServerError(error.response?.data);
       }

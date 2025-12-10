@@ -18,9 +18,13 @@ import { toast } from "react-toastify";
 
 export function AddDeliveryAddress() {
   const [location, setLocation] = useState("");
-  const [savedLocation, setSavedLocation] = useState(
-    window?.localStorage?.getItem("location")
-  );
+  const [savedLocation, setSavedLocation] = useState("");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("location");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (stored) setSavedLocation(stored);
+  }, []);
 
   const handleClickDeliverHereButton = () => {
     if (location.trim() !== "") {

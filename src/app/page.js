@@ -35,7 +35,7 @@ export default function Home() {
   useEffect(() => {
     const loadData = async () => {
       const categoriesData = await fetchCategories();
-      console.log("categoriesData-----", categoriesData);
+      // console.log("categoriesData-----", categoriesData);
       if (categoriesData.length > 0) {
         await fetchAllFoods(categoriesData);
       } else {
@@ -46,8 +46,6 @@ export default function Home() {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // const handleClickRedPlusButton = () => {};
 
   if (loading) {
     return (

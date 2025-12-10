@@ -1,3 +1,4 @@
+import { Instagram } from "lucide-react";
 import FacebookIcon from "../Icons/FacebookIcon";
 import InstagramIcon from "../Icons/InstagramIcon";
 import LogoIcon from "../Icons/LogoIcon";
@@ -6,10 +7,13 @@ export function Footer() {
   return (
     <div className="w-screen flex items-center justify-center bg-[#18181B]">
       <div className="flex flex-col gap-[76px] bg-[#18181B] h-[755px] w-[1440px] items-center justify-center">
-        <div className="flex gap-[34px] py-7 w-[1440px] bg-[#EF4444] text-[#FAFAFA] font-semibold text-3xl">
-          <p>Fresh fast delivered </p>
-          <p>Fresh fast delivered </p>
-          <p>Fresh fast delivered </p>
+        <div className="flex items-center justify-center w-screen bg-[#EF4444]">
+          <div className="overflow-hidden flex items-center justify-center gap-[34px] py-7 w-[1440px] bg-[#EF4444] text-[#FAFAFA] font-semibold text-3xl">
+            <p>Fresh fast delivered </p>
+            <p>Fresh fast delivered </p>
+            <p>Fresh fast delivered </p>
+            <p>Fresh fast delivered </p>
+          </div>
         </div>
         <div className="flex flex-col items-center gap-[104px]">
           <div className="flex gap-[220px] items-start w-[1264px]">
@@ -52,7 +56,7 @@ export function Footer() {
                 <p className="text-[#71717A]">FOLLOW US</p>
                 <div className="flex gap-4 py-[5px]">
                   <FacebookIcon />
-                  <InstagramIcon />
+                  <Instagram />
                 </div>
               </div>
             </div>

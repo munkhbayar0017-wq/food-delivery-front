@@ -14,6 +14,7 @@ export function LoginFirst({
   isClick,
   total,
   setFoodsDetail,
+  location,
 }) {
   const router = useRouter();
   const { postOrder } = useFoodCategory();
@@ -28,13 +29,13 @@ export function LoginFirst({
 
   const createOrder = async () => {
     const foodQuantity = localStorage.getItem("orders");
-    const address = localStorage.getItem("location");
-    console.log("addressss", address);
+    // const address = localStorage.getItem("location");
+    // console.log("addressss", address);
     try {
       await postOrder({
         totalPrice: total,
         foodOrderItems: JSON.parse(foodQuantity),
-        address: address,
+        address: location,
       });
 
       setFoodsDetail([]);
