@@ -24,8 +24,6 @@ import {
 import FileIcon from "../Icons/FileIcon";
 import { Button } from "@/components/ui/button";
 import DeleteIcon from "../Icons/DeleteIcon";
-import axios from "axios";
-import { toast } from "react-toastify";
 import { useState } from "react";
 import { useFoodCategory } from "../_provider/FoodCategory";
 
@@ -37,30 +35,6 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
   const [image, setImage] = useState(food?.image);
   const [selectedCategory, setSelectedCategory] = useState(food?.category);
   const [imageLoading, setImageLoading] = useState(false);
-
-  // const UPLOAD_PRESET = "food-delivery";
-  // const CLOUD_NAME = "dyntg7qqu";
-
-  // const UploadImage = async (file) => {
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   formData.append("upload_preset", UPLOAD_PRESET);
-
-  //   try {
-  //     const response = await fetch(
-  //       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-  //       {
-  //         method: "POST",
-  //         body: formData,
-  //       }
-  //     );
-
-  //     const data = await response.json();
-  //     return data.secure_url;
-  //   } catch (error) {
-  //     console.error("Cloudinary upload failed:", error);
-  //   }
-  // };
 
   const handleUploadImage = async (event) => {
     const file = event.target.files[0];
@@ -101,7 +75,6 @@ export default function FoodsMap({ food, categories, onUpdated, onDeleted }) {
     }
   };
   const handleDeleteButton = async (id) => {
-    console.log(id);
     try {
       await deleteFood(id);
       if (onDeleted) {

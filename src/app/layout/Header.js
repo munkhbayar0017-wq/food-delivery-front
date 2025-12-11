@@ -10,15 +10,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useFoodCategory } from "../_provider/FoodCategory";
 import { useRouter } from "next/navigation";
 
 export function Header() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  // const [isOpen, setIsOpen] = useState(false);
-  // const [foodOrder, setFoodOrder] = useState([]);
-  const { fetchOrderById } = useFoodCategory();
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
 
@@ -48,16 +44,6 @@ export function Header() {
     router.push("/signup");
   };
 
-  // const handleGetOrders = async () => {
-  //   try {
-  //     const order = await fetchOrderById();
-  //     setFoodOrder(order);
-  //     console.log("order", order);
-  //   } catch (err) {
-  //     toast.error("Failed to load order details");
-  //   }
-  // };
-
   return (
     <div className="w-screen bg-[#18181B] flex items-center justify-center">
       <div className="w-[1440px] bg-[#18181B] flex justify-between items-center py-3 px-[88px]">
@@ -77,10 +63,7 @@ export function Header() {
           <OrderDetail setOpen={setOpen} open={open} />
           <Popover>
             <PopoverTrigger asChild>
-              <div
-                // onClick={handleGetOrders}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200"
-              >
+              <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200">
                 <UserIcon />
               </div>
             </PopoverTrigger>

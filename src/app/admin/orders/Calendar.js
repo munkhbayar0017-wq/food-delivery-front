@@ -12,8 +12,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { X } from "lucide-react";
+import { useState, useEffect } from "react";
 
-// formatDate-д date параметр дамжуулна
 function formatDate(date) {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
@@ -23,25 +24,31 @@ function formatDate(date) {
   });
 }
 
-export function Calendar29() {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("Today");
+export function Calendar29({ onDateSelect, selectedDate, onClear }) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(
+    selectedDate ? formatDate(selectedDate) : ""
+  );
+  const [date, setDate] = useState(selectedDate);
+  const [month, setMonth] = useState(selectedDate);
 
-  // parseDate ашиглан анхны огноог state-д хадгалах
-  const initialDate = parseDate(value) || undefined;
-  const [date, setDate] = React.useState(initialDate);
-  const [month, setMonth] = React.useState(initialDate);
-
+  useEffect(() => {
+    if (selectedDate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setValue(formatDate(selectedDate));
+      setDate(selectedDate);
+    } else {
+      setValue("");
+      setDate(undefined);
+    }
+  }, [selectedDate]);
   return (
-    <div className="flex flex-col gap-3">
-      {/* <Label htmlFor="date" className="px-1">
-        Schedule Date
-      </Label> */}
+    <div className="flex gap-2">
       <div className="relative flex gap-2">
         <Input
           id="date"
           value={value}
-          placeholder="Tomorrow or next week"
+          placeholder="Select date"
           className="bg-background pr-10"
           onChange={(e) => {
             const inputValue = e.target.value;
@@ -82,15 +89,18 @@ export function Calendar29() {
                 setDate(selectedDate);
                 setValue(formatDate(selectedDate));
                 setOpen(false);
+                onDateSelect(selectedDate);
               }}
             />
           </PopoverContent>
         </Popover>
       </div>
-      {/* <div className="text-muted-foreground px-1 text-sm">
-        Your post will be published on{" "}
-        <span className="font-medium">{formatDate(date)}</span>.
-      </div> */}
+      {selectedDate && (
+        <Button variant="outline" size="sm" onClick={onClear} className="h-10">
+          <X className="h-4 w-4 mr-1" />
+          Clear
+        </Button>
+      )}
     </div>
   );
 }

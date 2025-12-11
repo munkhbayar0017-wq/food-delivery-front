@@ -1,6 +1,5 @@
 import { Instagram } from "lucide-react";
 import FacebookIcon from "../Icons/FacebookIcon";
-import InstagramIcon from "../Icons/InstagramIcon";
 import LogoIcon from "../Icons/LogoIcon";
 
 export function Footer() {

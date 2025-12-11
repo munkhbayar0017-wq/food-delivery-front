@@ -23,7 +23,6 @@ export default function AdminProvider({ children }) {
 
   useEffect(() => {
     const role = localStorage.getItem("role");
-    // console.log("role", role);
     const isAdmin = role === "ADMIN";
 
     if (!isAdmin) {

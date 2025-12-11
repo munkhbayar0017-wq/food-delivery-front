@@ -49,15 +49,16 @@ export default function SignupPage({ className }) {
     onSubmit: async (values) => {
       try {
         setServerError("");
-        await axios.post("http://localhost:168/authentication/sign-up", {
-          email: values.email,
-          password: values.password,
-        });
-        console.log("Account success");
+        await axios.post(
+          "https://food-delivery-back-d9vv.onrender.com/authentication/sign-up",
+          {
+            email: values.email,
+            password: values.password,
+          }
+        );
         toast.success("Account created successfully!");
         router.push("/login");
       } catch (error) {
-        console.log("User already exists");
         toast.error(error.response?.data || "User already exists");
         setServerError(error.response?.data);
       }

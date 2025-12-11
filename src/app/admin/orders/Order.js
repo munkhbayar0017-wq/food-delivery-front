@@ -35,6 +35,16 @@ import { Calendar29 } from "./Calendar";
 import { useFoodCategory } from "@/app/_provider/FoodCategory";
 import { ChangeDeliveryState } from "@/app/_components/ChangeDeliveryState";
 import Image from "next/image";
+import { toast } from "react-toastify";
+
+function formatDate(date) {
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 export function Order() {
   const [sorting, setSorting] = useState([]);
@@ -43,6 +53,9 @@ export function Order() {
   const [rowSelection, setRowSelection] = useState({});
   const { orders, fetchOrders, updateOrderStatus } = useFoodCategory();
   const [selectedIds, setSelectedIds] = useState([]);
+  const [filterDate, setFilterDate] = useState(null);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,6 +68,28 @@ export function Order() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection]);
 
+  useEffect(() => {
+    if (filterDate) {
+      const year = filterDate.getFullYear();
+      const month = String(filterDate.getMonth() + 1).padStart(2, "0");
+      const day = String(filterDate.getDate()).padStart(2, "0");
+      const selectedDateString = `${year}-${month}-${day}`;
+
+      const filtered = orders.filter((order) => {
+        const orderDate = order.updatedAt.split("T")[0];
+        return orderDate === selectedDateString;
+      });
+
+      if (filtered.length === 0) {
+        toast.error(`No orders found for ${formatDate(filterDate)}`);
+      }
+
+      setFilteredOrders(filtered);
+    } else {
+      setFilteredOrders(orders);
+    }
+  }, [filterDate, orders]);
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await updateOrderStatus(orderId, newStatus);
@@ -62,6 +97,14 @@ export function Order() {
     } catch (error) {
       console.error("Failed to update order status:", error);
     }
+  };
+
+  const handleDateSelect = (date) => {
+    setFilterDate(date);
+  };
+
+  const handleClearFilter = () => {
+    setFilterDate(null);
   };
 
   const columns = [
@@ -113,7 +156,6 @@ export function Order() {
       accessorKey: "foodOrderItems",
       header: () => <div className="text-left pl-7">Food</div>,
       cell: ({ row }) => {
-        // console.log("food222", row.original.foodOrderItems);
         return (
           <Select>
             <SelectTrigger className="border-none shadow-none w-30">
@@ -260,7 +302,7 @@ export function Order() {
   ];
 
   const table = useReactTable({
-    data: orders,
+    data: filteredOrders,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -291,7 +333,11 @@ export function Order() {
             </div>
           </div>
           <div className="flex gap-3">
-            <Calendar29 />
+            <Calendar29
+              onDateSelect={handleDateSelect}
+              selectedDate={filterDate}
+              onClear={handleClearFilter}
+            />
             <ChangeDeliveryState selectedIds={selectedIds} />
           </div>
         </div>

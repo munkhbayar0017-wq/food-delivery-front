@@ -29,8 +29,6 @@ export function LoginFirst({
 
   const createOrder = async () => {
     const foodQuantity = localStorage.getItem("orders");
-    // const address = localStorage.getItem("location");
-    // console.log("addressss", address);
     try {
       await postOrder({
         totalPrice: total,
@@ -39,6 +37,7 @@ export function LoginFirst({
       });
 
       setFoodsDetail([]);
+      localStorage.removeItem("orders");
     } catch (error) {
       console.error(error);
     }

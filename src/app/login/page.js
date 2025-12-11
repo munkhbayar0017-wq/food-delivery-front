@@ -33,7 +33,7 @@ export default function LoginPage({ className }) {
       try {
         setServerError("");
         const response = await axios.post(
-          "http://localhost:168/authentication/login",
+          "https://food-delivery-back-d9vv.onrender.com/authentication/login",
           {
             email: values.email,
             password: values.password,
@@ -47,7 +47,6 @@ export default function LoginPage({ className }) {
         const role = response.data.user.role;
 
         const isAdmin = role === "ADMIN";
-        // console.log("Push to homepage success");
         toast.success("Login successful!");
         if (!isAdmin) {
           router.push("/");
@@ -55,7 +54,6 @@ export default function LoginPage({ className }) {
           router.push("/admin");
         }
       } catch (error) {
-        // console.log(error.response?.data);
         toast.error(error.response?.data || "User not found");
         setServerError(error.response?.data);
       }

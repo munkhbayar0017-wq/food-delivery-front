@@ -23,7 +23,6 @@ export default function Administrator() {
   };
   return (
     <div className="flex w-screen gap-6 items-start justify-start bg-[#F4F4F5]">
-      {/* sticky */}
       <div className="w-[205px] h-screen sticky top-0 border flex flex-col items-center gap-10 px-5 py-9 bg-[#FFFFFF]">
         <div className="flex gap-2 cursor-pointer" onClick={moveToHomePage}>
           <LogoIcon />

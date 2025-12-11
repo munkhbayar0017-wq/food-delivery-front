@@ -16,11 +16,9 @@ import FoodsDetailMap from "./FoodsDetailMap";
 import LogoIcon from "../Icons/LogoIcon";
 import { LoginFirst } from "./LoginFirst";
 import { useFoodCategory } from "../_provider/FoodCategory";
-import Image from "next/image";
 import FoodIcon from "../Icons/FoodIcon";
 import TimerIcon from "../Icons/TimerIcon";
 import MapIcon from "../Icons/MapIcon";
-import { toast } from "react-toastify";
 
 export function OrderDetail({ open, setOpen }) {
   const [orderItems, setOrderItems] = useState([]);
@@ -28,7 +26,6 @@ export function OrderDetail({ open, setOpen }) {
   const [foodsDetail, setFoodsDetail] = useState([]);
   const [foodOrder, setFoodOrder] = useState([]);
   const { fetchOrderById } = useFoodCategory();
-  // console.log("foodorder", foodOrder);
 
   useEffect(() => {
     if (open) {
@@ -48,7 +45,6 @@ export function OrderDetail({ open, setOpen }) {
     try {
       const order = await fetchOrderById();
       setFoodOrder(order);
-      // console.log("order", order);
       if (foodOrder.length === 0) {
         setActive("Cart");
       } else {
@@ -56,7 +52,6 @@ export function OrderDetail({ open, setOpen }) {
       }
     } catch (err) {
       console.log("Failed to load order details");
-      // toast.error("Failed to load order details");
     }
   };
 
@@ -87,7 +82,9 @@ export function OrderDetail({ open, setOpen }) {
 
       const uniqueFoodIds = [...new Set(mergedOrders.map((item) => item.food))];
       const promises = uniqueFoodIds.map((foodId) => {
-        return axios.get(`http://localhost:168/food/foodId/${foodId}`);
+        return axios.get(
+          `https://food-delivery-back-d9vv.onrender.com/food/foodId/${foodId}`
+        );
       });
       const response = await Promise.all(promises);
 
@@ -270,7 +267,6 @@ export function OrderDetail({ open, setOpen }) {
                 </div>
               </div>
               <SheetFooter>
-                {/* {value.length !== 0 && <LoginFirst setIsClick={setIsClick} />} */}
                 <LoginFirst
                   setIsClick={setIsClick}
                   isClick={isClick}

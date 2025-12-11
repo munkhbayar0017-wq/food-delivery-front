@@ -22,13 +22,14 @@ export const FoodCategoryProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [foods, setFoods] = useState([]);
   const [orders, setOrders] = useState([]);
-  // const [ordersByIds, setOrdersByIds] = useState();
   const UPLOAD_PRESET = "food-delivery";
   const CLOUD_NAME = "dyntg7qqu";
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:168/food-category");
+      const response = await axios.get(
+        "https://food-delivery-back-d9vv.onrender.com/food-category"
+      );
       setCategories(response.data);
       return response.data;
     } catch (error) {
@@ -41,7 +42,7 @@ export const FoodCategoryProvider = ({ children }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:168/food-category",
+        "https://food-delivery-back-d9vv.onrender.com/food-category",
         {
           categoryName: categoryName,
         },
@@ -59,9 +60,12 @@ export const FoodCategoryProvider = ({ children }) => {
   const deleteCategories = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:168/food-category/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://food-delivery-back-d9vv.onrender.com/food-category/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       toast.success("Category deleted successfully!");
       fetchCategories();
     } catch (error) {
@@ -74,13 +78,12 @@ export const FoodCategoryProvider = ({ children }) => {
   const fetchFoods = async (categoryId) => {
     try {
       const response = await axios.get(
-        `http://localhost:168/food/${categoryId}`
+        `https://food-delivery-back-d9vv.onrender.com/food/${categoryId}`
       );
       setFoods(response.data);
       return response.data;
     } catch (error) {
       console.error("Failed to fetch food", error);
-      // toast.error("Failed to fetch foods");
       return [];
     }
   };
@@ -88,9 +91,13 @@ export const FoodCategoryProvider = ({ children }) => {
   const postFood = async (foodData) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post("http://localhost:168/food", foodData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        "https://food-delivery-back-d9vv.onrender.com/food",
+        foodData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       toast.success("Dish added successfully!");
       return response.data;
     } catch (error) {
@@ -105,7 +112,7 @@ export const FoodCategoryProvider = ({ children }) => {
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        "http://localhost:168/food",
+        "https://food-delivery-back-d9vv.onrender.com/food",
         {
           id,
           ...foodData,
@@ -128,9 +135,12 @@ export const FoodCategoryProvider = ({ children }) => {
   const deleteFood = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:168/food/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://food-delivery-back-d9vv.onrender.com/food/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       toast.success("Dish deleted successfully!");
     } catch (error) {
@@ -167,9 +177,12 @@ export const FoodCategoryProvider = ({ children }) => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:168/order", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        "https://food-delivery-back-d9vv.onrender.com/order",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setOrders(response.data);
       return response.data;
     } catch (error) {
@@ -183,15 +196,16 @@ export const FoodCategoryProvider = ({ children }) => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get("http://localhost:168/order/userId", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // setOrdersByIds(response.data);
-      // console.log("response", response);
+      const response = await axios.get(
+        "https://food-delivery-back-d9vv.onrender.com/order/userId",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       return response.data;
     } catch (error) {
       console.error("Failed to fetch order by id", error);
-      // toast.error("Failed to fetch order");
       return null;
     }
   };
@@ -200,7 +214,7 @@ export const FoodCategoryProvider = ({ children }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:168/order",
+        "https://food-delivery-back-d9vv.onrender.com/order",
         orderData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -224,7 +238,7 @@ export const FoodCategoryProvider = ({ children }) => {
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        "http://localhost:168/order",
+        "https://food-delivery-back-d9vv.onrender.com/order",
         {
           id: id,
           status: status,
@@ -261,7 +275,6 @@ export const FoodCategoryProvider = ({ children }) => {
         postOrder,
         fetchOrders,
         updateOrderStatus,
-        // ordersByIds,
         fetchOrderById,
       }}
     >

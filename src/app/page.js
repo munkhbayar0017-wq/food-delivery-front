@@ -14,7 +14,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [orderItems, setOrderItems] = useState([]);
 
-  // SAIN OILGOOROIII
   const fetchAllFoods = async (categories) => {
     const foodsPromises = categories.map(async (category) => ({
       id: category._id,
@@ -31,11 +30,10 @@ export default function Home() {
     setFoodsByCategory(foodsData);
     setLoading(false);
   };
-  //AIAIAIAII
+
   useEffect(() => {
     const loadData = async () => {
       const categoriesData = await fetchCategories();
-      // console.log("categoriesData-----", categoriesData);
       if (categoriesData.length > 0) {
         await fetchAllFoods(categoriesData);
       } else {
@@ -152,12 +150,10 @@ export default function Home() {
 
               return (
                 <div key={category._id} className="flex flex-col w-full gap-13">
-                  {/* Category Title */}
                   <div className="text-white font-inter text-[30px] font-semibold leading-9 tracking-[-0.75px]">
                     {category.categoryName}
                   </div>
 
-                  {/* Foods inside category */}
                   <div className="grid grid-cols-3 gap-9">
                     {foods.map((food) => (
                       <div
