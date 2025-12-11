@@ -12,9 +12,10 @@ import {
 import RedPlusIcon from "../Icons/RedPlusIcon";
 import MinusIcon from "../Icons/MinusIcon";
 import BlackPlusIcon from "../Icons/BlackPlusIcon";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import CheckedIcon from "../Icons/CheckedIcon";
 
 export function FoodDetail({
   foodName,
@@ -24,8 +25,19 @@ export function FoodDetail({
   foodId,
   orderItems,
   setOrderItems,
+  fetchAllFoods,
 }) {
   const [count, setCount] = useState(1);
+  const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    const exists = orders.some((item) => item.food === foodId);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsChecked(exists);
+    // fetchAllFoods();
+  }, [fetchAllFoods, foodId]);
+
   const handleClickMinusButton = () => {
     if (count === 1) {
       return;
@@ -43,6 +55,7 @@ export function FoodDetail({
       "orders",
       JSON.stringify([...orderItems, { food: foodId, quantity: count }])
     );
+    setIsChecked(true);
     toast.success("Food is being added to the cart!");
   };
 
@@ -55,11 +68,18 @@ export function FoodDetail({
       }}
     >
       <form>
-        <DialogTrigger asChild>
-          <div className="absolute flex items-center justify-center rounded-full z-10 h-11 w-11 bg-[#FFFFFF] cursor-pointer">
-            <RedPlusIcon />
+        {isChecked ? (
+          <div className="absolute flex items-center justify-center rounded-full z-10 h-11 w-11 bg-[#18181B] cursor-pointer">
+            <CheckedIcon />
           </div>
-        </DialogTrigger>
+        ) : (
+          <DialogTrigger asChild>
+            <div className="absolute flex items-center justify-center rounded-full z-10 h-11 w-11 bg-[#FFFFFF] cursor-pointer">
+              <RedPlusIcon />
+            </div>
+          </DialogTrigger>
+        )}
+
         <DialogContent className="flex gap-6 w-[826px] h-[412px]">
           <div className="relative w-[377px] h-[364px] rounded-xl">
             <Image

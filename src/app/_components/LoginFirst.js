@@ -15,6 +15,9 @@ export function LoginFirst({
   total,
   setFoodsDetail,
   location,
+  setShowAddressError,
+  handleGetOrders,
+  loadHomeDatas,
 }) {
   const router = useRouter();
   const { postOrder } = useFoodCategory();
@@ -38,17 +41,20 @@ export function LoginFirst({
 
       setFoodsDetail([]);
       localStorage.removeItem("orders");
+      loadHomeDatas();
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleClickCheckoutButton = () => {
-    if (disabled) {
+    if (!location || location.trim().length === 0) {
+      setShowAddressError(true);
       return;
     }
     if (token) {
       createOrder();
+      handleGetOrders();
     } else {
       setIsClick(true);
     }
@@ -60,8 +66,8 @@ export function LoginFirst({
         className={`w-full h-11 rounded-full font-inter text-sm font-medium leading-5 transition-colors duration-200
     ${
       disabled
-        ? "bg-[#ef444488] text-white cursor-not-allowed opacity-50"
-        : "bg-[#EF4444] text-white hover:bg-red-600"
+        ? "bg-[#ef444488] text-white cursor-pointer opacity-50"
+        : "bg-[#EF4444] text-white hover:bg-red-600 cursor-pointer"
     }
   `}
         type="button"

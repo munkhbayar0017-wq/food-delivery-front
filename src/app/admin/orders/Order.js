@@ -30,6 +30,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 import { Calendar29 } from "./Calendar";
 import { useFoodCategory } from "@/app/_provider/FoodCategory";
@@ -55,6 +64,7 @@ export function Order() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [filterDate, setFilterDate] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -91,11 +101,35 @@ export function Order() {
   }, [filterDate, orders]);
 
   const handleStatusChange = async (orderId, newStatus) => {
+    const currentPageIndex = table.getState().pagination.pageIndex;
+
+    setIsUpdatingStatus(true);
+
     try {
+      setFilteredOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          (order._id || order.id) === orderId
+            ? { ...order, status: newStatus }
+            : order
+        )
+      );
+
       await updateOrderStatus(orderId, newStatus);
+      toast.success("Status updated successfully!");
+
       await fetchOrders();
+
+      setTimeout(() => {
+        table.setPageIndex(currentPageIndex);
+        setIsUpdatingStatus(false);
+      }, 0);
     } catch (error) {
       console.error("Failed to update order status:", error);
+      setIsUpdatingStatus(false);
+      await fetchOrders();
+      setTimeout(() => {
+        table.setPageIndex(currentPageIndex);
+      }, 0);
     }
   };
 
@@ -318,10 +352,98 @@ export function Order() {
       columnVisibility,
       rowSelection,
     },
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
+  const pageCount = table.getPageCount();
+  const currentPage = table.getState().pagination.pageIndex;
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+
+    if (pageCount <= maxVisiblePages) {
+      for (let i = 0; i < pageCount; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => table.setPageIndex(i)}
+              isActive={currentPage === i}
+              className="cursor-pointer"
+            >
+              {i + 1}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      items.push(
+        <PaginationItem key={0}>
+          <PaginationLink
+            onClick={() => table.setPageIndex(0)}
+            isActive={currentPage === 0}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+
+      if (currentPage > 2) {
+        items.push(
+          <PaginationItem key="ellipsis-start">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+
+      const start = Math.max(1, currentPage - 1);
+      const end = Math.min(pageCount - 2, currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => table.setPageIndex(i)}
+              isActive={currentPage === i}
+              className="cursor-pointer"
+            >
+              {i + 1}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+
+      if (currentPage < pageCount - 3) {
+        items.push(
+          <PaginationItem key="ellipsis-end">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+
+      items.push(
+        <PaginationItem key={pageCount - 1}>
+          <PaginationLink
+            onClick={() => table.setPageIndex(pageCount - 1)}
+            isActive={currentPage === pageCount - 1}
+            className="cursor-pointer"
+          >
+            {pageCount}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
+
   return (
-    <div className="flex h-screen gap-6 items-center justify-center">
+    <div className="flex h-screen gap-6 items-start justify-center">
       <div className="w-[1170px] bg-[#FFFFFF] rounded-md">
         <div className="flex items-center py-4 border-t border-r border-l rounded-t-md justify-between p-4">
           <div className="flex flex-col">
@@ -342,7 +464,17 @@ export function Order() {
           </div>
         </div>
 
-        <div className="overflow-hidden border">
+        <div className="overflow-hidden border relative">
+          {isUpdatingStatus && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-10">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-8 h-8 border-4 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm text-gray-600 font-medium">
+                  Updating...
+                </span>
+              </div>
+            </div>
+          )}
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -394,28 +526,44 @@ export function Order() {
           </Table>
         </div>
 
-        <div className="flex items-center justify-end space-x-2 p-4 border rounded-b-md">
-          <div className="text-muted-foreground flex-1 text-sm">
+        <div className="flex items-center justify-between p-4 border rounded-b-md">
+          <div className="text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+
+          <div className="flex items-center gap-2">
+            <div className="w-[100px] text-sm text-muted-foreground mr-4">
+              Page {currentPage + 1} of {pageCount}
+            </div>
+
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => table.previousPage()}
+                    className={
+                      !table.getCanPreviousPage()
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+
+                {renderPaginationItems()}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => table.nextPage()}
+                    className={
+                      !table.getCanNextPage()
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </div>
       </div>

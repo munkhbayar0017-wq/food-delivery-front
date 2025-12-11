@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { useRouter } from "next/navigation";
 
-export function Header() {
+export function Header({ loadHomeDatas }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -60,7 +60,11 @@ export function Header() {
         </div>
         <div className="flex gap-3">
           <AddDeliveryAddress />
-          <OrderDetail setOpen={setOpen} open={open} />
+          <OrderDetail
+            setOpen={setOpen}
+            open={open}
+            loadHomeDatas={loadHomeDatas}
+          />
           <Popover>
             <PopoverTrigger asChild>
               <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#EF4444] cursor-pointer hover:bg-red-600 transition-colors duration-200">

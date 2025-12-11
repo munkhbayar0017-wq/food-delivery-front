@@ -20,12 +20,13 @@ import FoodIcon from "../Icons/FoodIcon";
 import TimerIcon from "../Icons/TimerIcon";
 import MapIcon from "../Icons/MapIcon";
 
-export function OrderDetail({ open, setOpen }) {
+export function OrderDetail({ open, setOpen, loadHomeDatas }) {
   const [orderItems, setOrderItems] = useState([]);
   const [active, setActive] = useState("Cart");
   const [foodsDetail, setFoodsDetail] = useState([]);
   const [foodOrder, setFoodOrder] = useState([]);
   const { fetchOrderById } = useFoodCategory();
+  const [showAddressError, setShowAddressError] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -210,9 +211,12 @@ export function OrderDetail({ open, setOpen }) {
                       onChange={(e) => {
                         setValue(e.target.value);
                         window.localStorage.setItem("location", e.target.value);
+                        if (e.target.value.length > 0) {
+                          setShowAddressError(false);
+                        }
                       }}
                     />
-                    {isClick && value.length === 0 && (
+                    {showAddressError && value.length === 0 && (
                       <div className="text-[#EF4444] font-inter text-[12.8px] font-normal leading-[19.2px]">
                         Please complete your address
                       </div>
@@ -270,12 +274,13 @@ export function OrderDetail({ open, setOpen }) {
                 <LoginFirst
                   setIsClick={setIsClick}
                   isClick={isClick}
-                  disabled={
-                    !value || value.length === 0 || foodsDetail.length === 0
-                  }
+                  disabled={foodsDetail.length === 0}
                   total={total}
                   location={value}
                   setFoodsDetail={setFoodsDetail}
+                  setShowAddressError={setShowAddressError}
+                  handleGetOrders={handleGetOrders}
+                  loadHomeDatas={loadHomeDatas}
                 />
               </SheetFooter>
             </div>

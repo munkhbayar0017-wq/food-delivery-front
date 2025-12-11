@@ -31,16 +31,16 @@ export default function Home() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      const categoriesData = await fetchCategories();
-      if (categoriesData.length > 0) {
-        await fetchAllFoods(categoriesData);
-      } else {
-        setLoading(false);
-      }
-    };
+  const loadData = async () => {
+    const categoriesData = await fetchCategories();
+    if (categoriesData.length > 0) {
+      await fetchAllFoods(categoriesData);
+    } else {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -136,7 +136,7 @@ export default function Home() {
   }
   return (
     <div className="flex flex-col">
-      <Header orderItems={orderItems} />
+      <Header orderItems={orderItems} loadHomeDatas={loadData} />
       <div className="w-screen bg-[#404040] flex flex-col items-center justify-center">
         <div className="w-[1440px] h-[570px] bg-[url('/Image.png')] bg-cover bg-center"></div>
         <div className="p-22">
@@ -169,6 +169,7 @@ export default function Home() {
                             foodId={food._id}
                             orderItems={orderItems}
                             setOrderItems={setOrderItems}
+                            fetchAllFoods={fetchAllFoods}
                           />
                           <Image
                             src={food.image}
