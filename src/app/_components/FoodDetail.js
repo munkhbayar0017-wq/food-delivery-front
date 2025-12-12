@@ -29,6 +29,7 @@ export function FoodDetail({
 }) {
   const [count, setCount] = useState(1);
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const orders = JSON.parse(localStorage.getItem("orders")) || [];
@@ -50,6 +51,8 @@ export function FoodDetail({
   };
 
   const handleClickAddToCartButton = () => {
+    if (loading) return;
+    setLoading(true);
     setOrderItems((prev) => [...prev, { food: foodId, quantity: count }]);
     localStorage.setItem(
       "orders",
@@ -57,6 +60,9 @@ export function FoodDetail({
     );
     setIsChecked(true);
     toast.success("Food is being added to the cart!");
+    setTimeout(() => {
+      setLoading(false);
+    }, 600);
   };
 
   return (
@@ -136,7 +142,14 @@ export function FoodDetail({
                     className="w-[377px] h-11 rounded-full cursor-pointer"
                     onClick={handleClickAddToCartButton}
                   >
-                    Add to cart
+                    {loading ? (
+                      <>
+                        <span className="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"></span>
+                        Adding...
+                      </>
+                    ) : (
+                      "Add to cart"
+                    )}
                   </Button>
                 </DialogClose>
               </DialogFooter>
