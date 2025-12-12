@@ -140,7 +140,7 @@ export function OrderDetail({ open, setOpen, loadHomeDatas }) {
           )}
         </div>
       </SheetTrigger>
-      <SheetContent className="bg-[#404040] w-[535px] rounded-l-2xl p-8">
+      <SheetContent className="bg-[#404040] overflow-scroll w-[535px] rounded-l-2xl p-8">
         <SheetHeader>
           <div className="flex gap-3 items-center">
             <WhiteCartIcon />

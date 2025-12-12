@@ -19,6 +19,7 @@ export default function SignupPage({ className }) {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
   const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const signupSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -48,6 +49,8 @@ export default function SignupPage({ className }) {
     validationSchema: signupSchema,
     onSubmit: async (values) => {
       try {
+        if (loading) return;
+        setLoading(true);
         setServerError("");
         await axios.post(
           "https://food-delivery-back-d9vv.onrender.com/authentication/sign-up",
@@ -61,6 +64,8 @@ export default function SignupPage({ className }) {
       } catch (error) {
         toast.error(error.response?.data || "User already exists");
         setServerError(error.response?.data);
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -117,10 +122,17 @@ export default function SignupPage({ className }) {
                     <Field>
                       <Button
                         type="submit"
-                        disabled={errors.email || !values.email}
+                        disabled={loading || errors.email || !values.email}
                         className="cursor-pointer"
                       >
-                        Let&apos;s go
+                        {loading ? (
+                          <>
+                            <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                            Loading...
+                          </>
+                        ) : (
+                          "Let’s go"
+                        )}
                       </Button>
                     </Field>
 

@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 export default function LoginPage({ className }) {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const loginSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -31,6 +32,8 @@ export default function LoginPage({ className }) {
     validationSchema: loginSchema,
     onSubmit: async (values) => {
       try {
+        if (loading) return;
+        setLoading(true);
         setServerError("");
         const response = await axios.post(
           "https://food-delivery-back-d9vv.onrender.com/authentication/login",
@@ -56,6 +59,8 @@ export default function LoginPage({ className }) {
       } catch (error) {
         toast.error(error.response?.data || "User not found");
         setServerError(error.response?.data);
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -89,6 +94,7 @@ export default function LoginPage({ className }) {
                       <Button
                         type="submit"
                         disabled={
+                          loading ||
                           errors.email ||
                           !values.email ||
                           errors.password ||
@@ -96,7 +102,14 @@ export default function LoginPage({ className }) {
                         }
                         className="cursor-pointer"
                       >
-                        Let&apos;s go
+                        {loading ? (
+                          <>
+                            <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                            Loading...
+                          </>
+                        ) : (
+                          "Let’s go"
+                        )}
                       </Button>
                     </Field>
                     <FieldDescription className="text-center">
