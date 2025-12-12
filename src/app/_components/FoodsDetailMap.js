@@ -12,6 +12,7 @@ const FoodsDetailMap = ({
   foodId,
   setOrderItems,
   onRemove,
+  fetchAllFoods,
 }) => {
   const item = orderItems?.find((i) => i.food === foodId);
   const quantity = item?.quantity ?? 1;
@@ -50,7 +51,7 @@ const FoodsDetailMap = ({
     const filteredIds = orders.filter((order) => order.food !== foodId);
     localStorage.setItem("orders", JSON.stringify(filteredIds));
     setOrderItems(filteredIds);
-
+    fetchAllFoods();
     if (onRemove) {
       onRemove(foodId);
     }
@@ -78,7 +79,7 @@ const FoodsDetailMap = ({
           <div className="text-red-500 font-inter text-[16px] font-semibold leading-8 tracking-[-0.6px]">
             {foodName}
           </div>
-          <div className="text-[#09090B] font-inter text-xs font-normal leading-5 max-w-[377px]">
+          <div className="text-[#09090B] font-inter text-xs font-normal leading-5 max-w-[250px]">
             {ingredients}
           </div>
         </div>

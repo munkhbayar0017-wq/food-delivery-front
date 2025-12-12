@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { useRouter } from "next/navigation";
 
-export function Header({ loadHomeDatas }) {
+export function Header({ loadHomeDatas, fetchAllFoods }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -64,6 +64,7 @@ export function Header({ loadHomeDatas }) {
             setOpen={setOpen}
             open={open}
             loadHomeDatas={loadHomeDatas}
+            fetchAllFoods={fetchAllFoods}
           />
           <Popover>
             <PopoverTrigger asChild>

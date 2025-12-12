@@ -35,7 +35,7 @@ export function FoodDetail({
     const exists = orders.some((item) => item.food === foodId);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsChecked(exists);
-    // fetchAllFoods();
+    fetchAllFoods();
   }, [fetchAllFoods, foodId]);
 
   const handleClickMinusButton = () => {

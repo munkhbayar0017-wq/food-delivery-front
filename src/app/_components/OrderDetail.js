@@ -20,7 +20,7 @@ import FoodIcon from "../Icons/FoodIcon";
 import TimerIcon from "../Icons/TimerIcon";
 import MapIcon from "../Icons/MapIcon";
 
-export function OrderDetail({ open, setOpen, loadHomeDatas }) {
+export function OrderDetail({ open, setOpen, loadHomeDatas, fetchAllFoods }) {
   const [orderItems, setOrderItems] = useState([]);
   const [active, setActive] = useState("Cart");
   const [foodsDetail, setFoodsDetail] = useState([]);
@@ -192,6 +192,7 @@ export function OrderDetail({ open, setOpen, loadHomeDatas }) {
                           foodId={food._id}
                           setOrderItems={setOrderItems}
                           onRemove={handleRemoveFood}
+                          fetchAllFoods={fetchAllFoods}
                         />
                       ))}
                     </div>

@@ -136,7 +136,11 @@ export default function Home() {
   }
   return (
     <div className="flex flex-col">
-      <Header orderItems={orderItems} loadHomeDatas={loadData} />
+      <Header
+        orderItems={orderItems}
+        loadHomeDatas={loadData}
+        fetchAllFoods={fetchAllFoods}
+      />
       <div className="w-screen bg-[#404040] flex flex-col items-center justify-center">
         <div className="w-[1440px] h-[570px] bg-[url('/Image.png')] bg-cover bg-center"></div>
         <div className="p-22">
