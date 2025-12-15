@@ -44,7 +44,7 @@ export default function Home() {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  //loading
   if (loading) {
     return (
       <div className="flex flex-col">
